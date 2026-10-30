@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CartKaro - Login</title>
+  <link rel="icon" type="image/png" href="logo.png">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@600;700;800&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+  <style>
+    :root {
+      --primary: #1e40af;
+      --primary-hover: #1d4ed8;
+      --text-dark: #0f172a;
+      --text-muted: #64748b;
+      --border: #e2e8f0;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: 'Inter', -apple-system, "Segoe UI", Roboto, sans-serif;
+      color: var(--text-dark);
+      background: #f8fafc;
+    }
+    h1, h2, h3, .brand-title { font-family: 'Outfit', 'Inter', sans-serif; }
+
+    .login-shell { min-height: 100vh; display: flex; }
+
+    /* ---------- Left hero panel ---------- */
+    .hero {
+      flex: 1.1;
+      position: relative;
+      overflow: hidden;
+      color: #fff;
+      padding: 56px 64px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 45%, #2563eb 100%);
+    }
+    .hero::before, .hero::after {
+      content: "";
+      position: absolute;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.07);
+    }
+    .hero::before { width: 520px; height: 520px; top: -160px; right: -140px; }
+    .hero::after  { width: 380px; height: 380px; bottom: -140px; left: -100px; }
+    .hero > * { position: relative; z-index: 1; }
+
+    .hero-brand { display: flex; align-items: center; gap: 12px; }
+    .hero-brand .logo-box {
+      width: 48px; height: 48px; border-radius: 12px;
+      background: #fff; display: flex; align-items: center; justify-content: center;
+      overflow: hidden;
+    }
+    .hero-brand .logo-box img { width: 100%; height: 100%; object-fit: contain; }
+    .hero-brand .logo-box i { font-size: 1.5rem; color: var(--primary); }
+    .hero-brand span { font-family: 'Outfit', sans-serif; font-size: 1.5rem; font-weight: 700; }
+
+    .hero h1 { font-size: 2.6rem; font-weight: 800; line-height: 1.15; margin-bottom: 16px; }
+    .hero p.lead { color: rgba(255,255,255,0.82); font-size: 1.05rem; max-width: 460px; }
+
+    .feature-list { list-style: none; padding: 0; margin: 32px 0 0; display: grid; gap: 14px; }
+    .feature-list li { display: flex; align-items: center; gap: 12px; font-weight: 500; }
+    .feature-list .ico {
+      width: 38px; height: 38px; border-radius: 10px;
+      background: rgba(255,255,255,0.15);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.1rem;
+    }
+    .hero-foot { font-size: 0.85rem; color: rgba(255,255,255,0.7); }
+
+    /* ---------- Right form panel ---------- */
+    .form-side {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 32px 20px;
+    }
+    .login-card {
+      width: 100%;
+      max-width: 420px;
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 40px 36px;
+      box-shadow: 0 20px 50px rgba(15, 23, 42, 0.08);
+    }
+    .login-card .badge-icon {
+      width: 56px; height: 56px; border-radius: 14px;
+      background: #eff6ff; color: var(--primary);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.6rem; margin-bottom: 18px;
+    }
+    .login-card h2 { font-weight: 700; font-size: 1.7rem; margin-bottom: 4px; }
+    .login-card .sub { color: var(--text-muted); margin-bottom: 26px; }
+
+    .form-label { font-weight: 600; font-size: 0.85rem; color: #334155; }
+    .input-group-text {
+      background: #f8fafc; border-color: var(--border); color: var(--text-muted);
+    }
+    .form-control { border-color: var(--border); padding: 11px 14px; }
+    .form-control:focus {
+      border-color: #93c5fd;
+      box-shadow: 0 0 0 0.22rem rgba(30, 64, 175, 0.12);
+    }
+    .input-group:focus-within .input-group-text { border-color: #93c5fd; color: var(--primary); }
+    .toggle-pass { cursor: pointer; border-left: 0; }
+
+    .btn-login {
+      background: var(--primary); border-color: var(--primary); color: #fff;
+      font-weight: 600; padding: 12px; border-radius: 10px;
+      transition: all .2s ease;
+    }
+    .btn-login:hover { background: var(--primary-hover); border-color: var(--primary-hover); color: #fff; transform: translateY(-1px); box-shadow: 0 8px 18px rgba(30, 64, 175, 0.25); }
+    .btn-login:disabled { opacity: .8; transform: none; box-shadow: none; }
+
+    .error-box {
+      display: none;
+      background: #fef2f2; border: 1px solid #fecaca; color: #b91c1c;
+      border-radius: 10px; padding: 10px 14px; font-size: 0.88rem; margin-bottom: 16px;
+    }
+    .error-box.show { display: flex; align-items: center; gap: 8px; animation: shake .35s; }
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-6px); }
+      75% { transform: translateX(6px); }
+    }
+
+    .hint {
+      margin-top: 22px; padding: 12px 14px; border-radius: 10px;
+      background: #f1f5f9; color: var(--text-muted); font-size: 0.82rem;
+    }
+    .hint code { color: var(--primary); font-weight: 600; background: transparent; }
+
+    @media (max-width: 991.98px) {
+      .hero { display: none; }
+      .form-side { background: linear-gradient(180deg, #eff6ff, #f8fafc); }
+    }
+  </style>
+</head>
+<body>
+  <div class="login-shell">
+
+    <!-- Hero / branding -->
+    <section class="hero">
+      <div class="hero-brand">
+        <div class="logo-box">
+          <img src="logo.png" alt="CartKaro" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+          <i class="bi bi-cart3" style="display:none;"></i>
+        </div>
+        <span>CartKaro</span>
+      </div>
+
+      <div>
+        <h1>Smarter billing.<br>Better inventory.</h1>
+        <p class="lead">Run your supermarket from one place: fast POS billing, live stock tracking and clear sales reports.</p>
+        <ul class="feature-list">
+          <li><span class="ico"><i class="bi bi-upc-scan"></i></span> Barcode-based quick billing</li>
+          <li><span class="ico"><i class="bi bi-box-seam"></i></span> Real-time inventory &amp; low-stock alerts</li>
+          <li><span class="ico"><i class="bi bi-graph-up-arrow"></i></span> Sales reports &amp; analytics</li>
+        </ul>
+      </div>
+
+      <div class="hero-foot">&copy; <span id="year"></span> CartKaro Supermarket Management System</div>
+    </section>
+
+    <!-- Login form -->
+    <section class="form-side">
+      <div class="login-card">
+        <div class="badge-icon"><i class="bi bi-shield-lock"></i></div>
+        <h2>Welcome back</h2>
+        <p class="sub">Sign in to access your dashboard.</p>
+
+        <div class="error-box" id="error-box" role="alert">
+          <i class="bi bi-exclamation-circle-fill"></i>
+          <span id="error-text">Invalid username or password.</span>
+        </div>
+
+        <form id="login-form" novalidate>
+          <div class="mb-3">
+            <label for="username" class="form-label">Username</label>
+            <div class="input-group">
+              <span class="input-group-text"><i class="bi bi-person"></i></span>
+              <input type="text" class="form-control" id="username" placeholder="Enter username" autocomplete="username" autofocus>
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label for="password" class="form-label">Password</label>
+            <div class="input-group">
+              <span class="input-group-text"><i class="bi bi-lock"></i></span>
+              <input type="password" class="form-control" id="password" placeholder="Enter password" autocomplete="current-password">
+              <span class="input-group-text toggle-pass" id="toggle-pass" title="Show / hide password">
+                <i class="bi bi-eye" id="toggle-icon"></i>
+              </span>
+            </div>
+          </div>
+
+          <div class="d-flex justify-content-between align-items-center mb-4">
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" id="remember">
+              <label class="form-check-label small text-muted" for="remember">Remember me</label>
+            </div>
+            <span class="small text-muted">Forgot password?</span>
+          </div>
+
+          <button type="submit" class="btn btn-login w-100" id="login-btn">
+            <span id="login-btn-text"><i class="bi bi-box-arrow-in-right me-2"></i>Login</span>
+          </button>
+        </form>
+
+        <div class="hint">
+          <i class="bi bi-info-circle me-1"></i>
+          Demo login &mdash; Username: <code>Admin</code> &nbsp; Password: <code>admin@123</code>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    // ---- Dummy credentials (frontend demo only, NOT real security) ----
+    const DEMO_USER = 'Admin';
+    const DEMO_PASS = 'admin@123';
+    const REDIRECT_TO = 'index.html';
+
+    document.getElementById('year').textContent = new Date().getFullYear();
+
+    const form = document.getElementById('login-form');
+    const userEl = document.getElementById('username');
+    const passEl = document.getElementById('password');
+    const errBox = document.getElementById('error-box');
+    const errText = document.getElementById('error-text');
+    const btn = document.getElementById('login-btn');
+    const btnText = document.getElementById('login-btn-text');
+
+    // Already logged in? Skip straight to the app.
+    if (sessionStorage.getItem('cartkaro_logged_in') === 'true' ||
+        localStorage.getItem('cartkaro_logged_in') === 'true') {
+      window.location.replace(REDIRECT_TO);
+    }
+
+    // Show / hide password
+    document.getElementById('toggle-pass').addEventListener('click', () => {
+      const show = passEl.type === 'password';
+      passEl.type = show ? 'text' : 'password';
+      document.getElementById('toggle-icon').className = show ? 'bi bi-eye-slash' : 'bi bi-eye';
+    });
+
+    function showError(msg) {
+      errText.textContent = msg;
+      errBox.classList.remove('show');
+      void errBox.offsetWidth; // restart shake animation
+      errBox.classList.add('show');
+    }
+
+    form.addEventListener('submit', e => {
+      e.preventDefault();
+      errBox.classList.remove('show');
+
+      const user = userEl.value.trim();
+      const pass = passEl.value;
+
+      if (!user || !pass) {
+        showError('Please enter both username and password.');
+        return;
+      }
+      if (user !== DEMO_USER || pass !== DEMO_PASS) {
+        showError('Invalid username or password.');
+        passEl.value = '';
+        passEl.focus();
+        return;
+      }
+
+      // Success
+      btn.disabled = true;
+      btnText.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Signing in...';
+
+      const store = document.getElementById('remember').checked ? localStorage : sessionStorage;
+      store.setItem('cartkaro_logged_in', 'true');
+      store.setItem('cartkaro_user', DEMO_USER);
+
+      setTimeout(() => window.location.href = REDIRECT_TO, 700);
+    });
+  </script>
+</body>
+</html>
