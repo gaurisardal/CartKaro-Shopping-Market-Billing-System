@@ -1,0 +1,396 @@
+/* ==========================================================================
+   CartKaro - Supermarket Inventory & Billing System
+   Theme: Professional Commercial Blue-and-White Theme
+   ========================================================================== */
+
+:root {
+  --bs-primary: #1e40af;
+  --bs-primary-rgb: 30, 64, 175;
+  --primary-hover: #1d4ed8;
+  --primary-light: #eff6ff;
+  --primary-border: #bfdbfe;
+  
+  --secondary-bg: #f8fafc;
+  --card-bg: #ffffff;
+  --border-color: #e2e8f0;
+  --text-dark: #0f172a;
+  --text-muted: #64748b;
+
+  --sidebar-width: 260px;
+  --sidebar-collapsed-width: 78px;
+  --topbar-height: 64px;
+
+  --purple: #7c3aed;
+  --purple-subtle: #f3e8ff;
+  --indigo: #4f46e5;
+  --indigo-subtle: #e0e7ff;
+}
+
+/* Base resets & typography */
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  color: var(--text-dark);
+  background-color: var(--secondary-bg);
+  min-height: 100vh;
+  margin: 0;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, h4, h5, h6, .brand-title {
+  font-family: 'Outfit', 'Inter', sans-serif;
+}
+
+/* Custom scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #f1f5f9;
+}
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* ==================== LAYOUT & WRAPPER ==================== */
+.app-wrapper {
+  min-height: 100vh;
+  width: 100vw;
+  overflow: hidden;
+}
+
+.main-content-wrapper {
+  height: 100vh;
+  background-color: #f8fafc;
+}
+
+/* ==================== SIDEBAR STYLING ==================== */
+.sidebar {
+  width: var(--sidebar-width);
+  height: 100vh;
+  z-index: 1040;
+  transition: width 0.25s cubic-bezier(0.4, 0, 0.2, 1), transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 2px 0 8px rgba(0, 0, 0, 0.03);
+}
+
+.brand-logo {
+  height: 40px;
+  max-width: 130px;
+  object-fit: contain;
+}
+
+.brand-icon-box {
+  width: 40px;
+  height: 40px;
+}
+
+.sidebar .nav-link {
+  color: #475569;
+  font-weight: 500;
+  font-size: 0.92rem;
+  transition: all 0.2s ease-in-out;
+  border: 1px solid transparent;
+}
+
+.sidebar .nav-link:hover {
+  background-color: #f1f5f9;
+  color: var(--bs-primary);
+  transform: translateX(3px);
+}
+
+.sidebar .nav-link.active {
+  background-color: #eff6ff !important;
+  color: var(--bs-primary) !important;
+  font-weight: 600;
+  border-color: #dbeafe;
+  box-shadow: 0 1px 3px rgba(30, 64, 175, 0.08);
+}
+
+.sidebar .nav-link.active i {
+  color: var(--bs-primary);
+}
+
+.avatar {
+  width: 38px;
+  height: 38px;
+  font-size: 0.9rem;
+}
+
+/* Collapsed Sidebar on Desktop */
+body.sidebar-collapsed .sidebar {
+  width: var(--sidebar-collapsed-width);
+}
+body.sidebar-collapsed .brand-text,
+body.sidebar-collapsed .sidebar-label,
+body.sidebar-collapsed .user-details,
+body.sidebar-collapsed #low-stock-sidebar-badge {
+  display: none !important;
+}
+body.sidebar-collapsed .sidebar-nav .nav-link {
+  justify-content: center !important;
+  padding: 12px !important;
+}
+body.sidebar-collapsed .sidebar-nav .nav-link i {
+  font-size: 1.25rem !important;
+  margin: 0 !important;
+}
+
+/* Mobile Sidebar Behavior */
+@media (max-width: 991.98px) {
+  .sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    transform: translateX(-100%);
+  }
+  body.sidebar-mobile-open .sidebar {
+    transform: translateX(0);
+  }
+  .sidebar-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(15, 23, 42, 0.45);
+    backdrop-filter: blur(2px);
+    z-index: 1030;
+  }
+}
+
+/* ==================== TOPBAR ==================== */
+.top-navbar {
+  height: var(--topbar-height);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.03);
+  z-index: 1020;
+}
+
+.max-w-md {
+  max-width: 440px;
+}
+
+/* ==================== STAT CARDS ==================== */
+.stat-card {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  border: 1px solid #eef2f6 !important;
+}
+
+.stat-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 18px rgba(30, 64, 175, 0.07) !important;
+}
+
+.stat-icon {
+  width: 42px;
+  height: 42px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.bg-purple-subtle {
+  background-color: #f3e8ff !important;
+}
+.text-purple {
+  color: #7c3aed !important;
+}
+.bg-indigo-subtle {
+  background-color: #e0e7ff !important;
+}
+.text-indigo {
+  color: #4338ca !important;
+}
+
+/* ==================== BARCODE SCANNER ANIMATION ==================== */
+.scanner-laser-line {
+  position: absolute;
+  top: 10px;
+  left: 10%;
+  right: 10%;
+  height: 2px;
+  background: #ef4444;
+  box-shadow: 0 0 8px #ef4444, 0 0 16px #ef4444;
+  animation: scanLaser 2s infinite ease-in-out;
+}
+
+@keyframes scanLaser {
+  0% {
+    top: 15px;
+    opacity: 0.3;
+  }
+  50% {
+    top: 140px;
+    opacity: 1;
+  }
+  100% {
+    top: 15px;
+    opacity: 0.3;
+  }
+}
+
+/* ==================== POS BILLING PRODUCT GRID & CARDS ==================== */
+.pos-product-card {
+  cursor: pointer;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  transition: all 0.2s ease;
+  background: #ffffff;
+  position: relative;
+  overflow: hidden;
+}
+
+.pos-product-card:hover {
+  border-color: #93c5fd;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 14px rgba(30, 64, 175, 0.08);
+}
+
+.pos-product-card.out-of-stock {
+  opacity: 0.55;
+  cursor: not-allowed;
+  filter: grayscale(0.5);
+}
+
+.pos-product-card.out-of-stock:hover {
+  border-color: #e2e8f0;
+  transform: none;
+  box-shadow: none;
+}
+
+.pos-product-icon-wrap {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.3rem;
+  background-color: #eff6ff;
+  color: #2563eb;
+}
+
+.pos-cart-card {
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08) !important;
+}
+
+.pos-cart-items-container::-webkit-scrollbar {
+  width: 5px;
+}
+
+.cart-qty-btn {
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+}
+
+/* ==================== PRINTABLE THERMAL RECEIPT ==================== */
+#printable-receipt {
+  font-family: 'Courier New', Courier, monospace;
+  color: #000;
+  line-height: 1.3;
+}
+
+.border-dashed {
+  border-bottom-style: dashed !important;
+}
+
+.receipt-items-table th,
+.receipt-items-table td {
+  padding: 3px 0;
+  border: none;
+  color: #000;
+}
+
+/* Native Print Styles */
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  #printable-receipt,
+  #printable-receipt * {
+    visibility: visible;
+  }
+  #printable-receipt {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 340px;
+    margin: 0;
+    padding: 10px;
+  }
+  .no-print {
+    display: none !important;
+  }
+}
+
+/* ==================== BUTTONS & BADGES ==================== */
+.btn-primary {
+  background-color: #1e40af;
+  border-color: #1e40af;
+}
+
+.btn-primary:hover,
+.btn-primary:focus {
+  background-color: #1d4ed8;
+  border-color: #1d4ed8;
+}
+
+.btn-outline-primary {
+  color: #1e40af;
+  border-color: #bfdbfe;
+}
+
+.btn-outline-primary:hover {
+  background-color: #1e40af;
+  border-color: #1e40af;
+}
+
+.badge {
+  font-weight: 500;
+  letter-spacing: 0.02em;
+}
+
+/* Subtle card styling */
+.card {
+  border-radius: 12px;
+}
+
+.table th {
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.76rem;
+  letter-spacing: 0.04em;
+  color: #64748b;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.table td {
+  color: #334155;
+  font-size: 0.88rem;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+/* Pulse animation for low-stock badge */
+@keyframes pulseBadge {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.15); }
+  100% { transform: scale(1); }
+}
+
+.pulse-badge {
+  animation: pulseBadge 1.8s infinite ease-in-out;
+}
