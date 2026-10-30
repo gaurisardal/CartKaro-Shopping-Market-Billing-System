@@ -1,0 +1,1861 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CartKaro - Supermarket Inventory & Billing Management System</title>
+  <meta name="description" content="Commercial grade Supermarket Inventory Management and Point-of-Sale Billing System frontend built with HTML, CSS, JavaScript, and Bootstrap 5.">
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="logo.png">
+
+  <!-- Google Fonts: Inter & Outfit -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Bootstrap 5.3.3 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  
+  <!-- Bootstrap Icons 1.11.3 -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  
+  <!-- Font Awesome 6.5.2 -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="bg-light">
+
+  <div class="app-wrapper d-flex">
+    
+    <!-- ==================== SIDEBAR ==================== -->
+    <aside id="sidebar" class="sidebar bg-white border-end d-flex flex-column">
+      <!-- Sidebar Header -->
+      <div class="sidebar-header p-3 border-bottom d-flex align-items-center justify-content-between">
+        <a href="#" class="brand-link d-flex align-items-center text-decoration-none">
+          <div class="brand-logo-container me-2">
+            <img src="logo.png" alt="CartKaro Logo" class="brand-logo" onerror="this.style.display='none'; document.getElementById('brand-fallback-icon').classList.remove('d-none');">
+            <div id="brand-fallback-icon" class="brand-icon-box bg-primary text-white rounded-3 d-none align-items-center justify-content-center">
+              <i class="bi bi-cart4 fs-4"></i>
+            </div>
+          </div>
+          <div class="brand-text">
+            <span class="brand-title fw-bold text-dark d-block">CartKaro</span>
+            <small class="brand-subtitle text-muted text-uppercase fw-semibold">Inventory & POS</small>
+          </div>
+        </a>
+        <button id="sidebar-close-btn" class="btn btn-sm btn-light d-lg-none" aria-label="Close Sidebar">
+          <i class="bi bi-x-lg"></i>
+        </button>
+      </div>
+
+      <!-- Quick Action POS Button -->
+      <div class="p-3 border-bottom">
+        <button class="btn btn-primary w-100 py-2 d-flex align-items-center justify-content-center gap-2 fw-semibold shadow-sm nav-link-btn" data-target="pos">
+          <i class="bi bi-receipt-cutoff fs-5"></i>
+          <span class="sidebar-label">New Bill (POS)</span>
+        </button>
+      </div>
+
+      <!-- Sidebar Navigation Menu -->
+      <nav class="sidebar-nav flex-grow-1 p-3 overflow-y-auto">
+        <ul class="nav nav-pills flex-column gap-1">
+          <li class="nav-item">
+            <a href="#dashboard" class="nav-link active d-flex align-items-center gap-3 py-2 px-3 rounded-3" data-target="dashboard">
+              <i class="bi bi-speedometer2 fs-5"></i>
+              <span class="sidebar-label">Dashboard</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="#products" class="nav-link d-flex align-items-center gap-3 py-2 px-3 rounded-3 text-secondary" data-target="products">
+              <i class="bi bi-box-seam fs-5"></i>
+              <span class="sidebar-label">Products</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="#inventory" class="nav-link d-flex align-items-center justify-content-between py-2 px-3 rounded-3 text-secondary" data-target="inventory">
+              <div class="d-flex align-items-center gap-3">
+                <i class="bi bi-boxes fs-5"></i>
+                <span class="sidebar-label">Inventory</span>
+              </div>
+              <span id="low-stock-sidebar-badge" class="badge bg-danger rounded-pill px-2 py-1 d-none">0</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="#scanner" class="nav-link d-flex align-items-center gap-3 py-2 px-3 rounded-3 text-secondary" data-target="scanner">
+              <i class="bi bi-upc-scan fs-5"></i>
+              <span class="sidebar-label">Barcode Scanner</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="#pos" class="nav-link d-flex align-items-center gap-3 py-2 px-3 rounded-3 text-secondary" data-target="pos">
+              <i class="bi bi-cart-check fs-5"></i>
+              <span class="sidebar-label">Billing / POS</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="#sales" class="nav-link d-flex align-items-center gap-3 py-2 px-3 rounded-3 text-secondary" data-target="sales">
+              <i class="bi bi-clock-history fs-5"></i>
+              <span class="sidebar-label">Sales History</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="#reports" class="nav-link d-flex align-items-center gap-3 py-2 px-3 rounded-3 text-secondary" data-target="reports">
+              <i class="bi bi-graph-up-arrow fs-5"></i>
+              <span class="sidebar-label">Reports & Analytics</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="#settings" class="nav-link d-flex align-items-center gap-3 py-2 px-3 rounded-3 text-secondary" data-target="settings">
+              <i class="bi bi-gear fs-5"></i>
+              <span class="sidebar-label">Settings</span>
+            </a>
+          </li>
+        </ul>
+      </nav>
+
+      <!-- Sidebar Footer User / Store Info -->
+      <div class="sidebar-footer p-3 border-top bg-light-subtle">
+        <div class="d-flex align-items-center gap-2">
+          <div class="avatar bg-primary-subtle text-primary rounded-circle d-flex align-items-center justify-content-center fw-bold">
+            CK
+          </div>
+          <div class="user-details overflow-hidden">
+            <div class="user-name fw-semibold text-truncate small" id="sidebar-shop-name">CartKaro Supermarket</div>
+            <div class="user-role text-muted small"><span class="badge bg-success-subtle text-success border border-success-subtle py-0">Online POS</span></div>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Sidebar Backdrop for Mobile -->
+    <div id="sidebar-backdrop" class="sidebar-backdrop d-none"></div>
+
+    <!-- ==================== MAIN CONTENT WRAPPER ==================== -->
+    <div class="main-content-wrapper flex-grow-1 d-flex flex-column min-vh-100 overflow-hidden">
+      
+      <!-- TOP NAVBAR -->
+      <header class="top-navbar bg-white border-bottom sticky-top px-3 py-2 d-flex align-items-center justify-content-between">
+        <div class="d-flex align-items-center gap-2">
+          <!-- Toggle Sidebar Button -->
+          <button id="sidebar-toggle-btn" class="btn btn-light btn-sm border" aria-label="Toggle navigation">
+            <i class="bi bi-list fs-5"></i>
+          </button>
+          
+          <!-- View Title Breadcrumb -->
+          <div class="d-none d-sm-block">
+            <h1 class="h6 mb-0 fw-bold text-dark text-capitalize" id="page-title">Dashboard</h1>
+            <small class="text-muted d-block" id="page-subtitle">Overview & statistics</small>
+          </div>
+        </div>
+
+        <!-- Global Search Bar -->
+        <div class="global-search-container mx-3 flex-grow-1 max-w-md d-none d-md-block position-relative">
+          <div class="input-group input-group-sm">
+            <span class="input-group-text bg-light border-end-0 text-muted"><i class="bi bi-search"></i></span>
+            <input type="text" id="global-search-input" class="form-control bg-light border-start-0" placeholder="Quick search product, barcode, or bill #...">
+          </div>
+          <div id="global-search-results" class="dropdown-menu shadow w-100 p-2 position-absolute mt-1 d-none" style="max-height: 350px; overflow-y: auto; z-index: 1050;"></div>
+        </div>
+
+        <!-- Top Right Actions -->
+        <div class="d-flex align-items-center gap-2">
+          <!-- Live Date & Clock Badge -->
+          <div class="live-clock-badge d-none d-lg-flex align-items-center gap-1 bg-light border rounded-pill px-3 py-1 small text-muted">
+            <i class="bi bi-clock text-primary"></i>
+            <span id="live-clock">--:--:--</span>
+          </div>
+
+          <!-- Notification Dropdown -->
+          <div class="dropdown">
+            <button class="btn btn-light btn-sm position-relative border" data-bs-toggle="dropdown" aria-expanded="false" id="notifications-btn" title="Stock Notifications">
+              <i class="bi bi-bell fs-6"></i>
+              <span id="notif-badge" class="position-absolute top-0 start-100 translate-middle p-1 bg-danger border border-light rounded-circle d-none">
+                <span class="visually-hidden">Alerts</span>
+              </span>
+            </button>
+            <div class="dropdown-menu dropdown-menu-end shadow p-0 notification-dropdown border-0" style="width: 320px; z-index: 1060;">
+              <div class="p-3 border-bottom d-flex align-items-center justify-content-between bg-light rounded-top">
+                <h6 class="mb-0 fw-bold"><i class="bi bi-bell me-1 text-primary"></i> Inventory Alerts</h6>
+                <span id="notif-count-badge" class="badge bg-primary rounded-pill">0 alerts</span>
+              </div>
+              <div id="notif-list" class="list-group list-group-flush overflow-y-auto" style="max-height: 280px;">
+                <div class="text-center p-4 text-muted small">No pending alerts</div>
+              </div>
+              <div class="p-2 border-top text-center bg-light rounded-bottom">
+                <a href="#inventory" class="btn btn-link btn-sm text-decoration-none fw-semibold p-0 nav-link-btn" data-target="inventory">Go to Inventory &rarr;</a>
+              </div>
+            </div>
+          </div>
+
+          <!-- Scanner Quick Shortcut -->
+          <button class="btn btn-outline-primary btn-sm d-flex align-items-center gap-1 nav-link-btn" data-target="scanner" title="Scan Barcode">
+            <i class="bi bi-upc-scan"></i>
+            <span class="d-none d-sm-inline">Scan</span>
+          </button>
+
+          <!-- Supabase Connection & Staff Login Badge -->
+          <button class="btn btn-sm btn-outline-primary border d-flex align-items-center gap-1" id="supabase-status-badge" data-bs-toggle="modal" data-bs-target="#supabase-auth-modal" title="Supabase Database Status & Staff Login">
+            <i class="bi bi-database text-primary" id="supabase-status-icon"></i>
+            <span class="d-none d-md-inline small fw-semibold" id="supabase-status-text">Supabase: Online</span>
+          </button>
+
+          <!-- Store Status Badge -->
+          <span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1 small d-none d-xl-inline">
+            <i class="bi bi-shop me-1"></i> Store Open
+          </span>
+        </div>
+      </header>
+
+      <!-- ==================== VIEWS CONTAINER ==================== -->
+      <main class="content-body flex-grow-1 p-3 p-md-4 overflow-y-auto">
+
+        <!-- ============================================================ -->
+        <!-- 1. DASHBOARD VIEW -->
+        <!-- ============================================================ -->
+        <section id="view-dashboard" class="app-view">
+          <!-- Top Welcome & Quick Actions Bar -->
+          <div class="row align-items-center justify-content-between mb-4 gy-2">
+            <div class="col-12 col-md-auto">
+              <h2 class="h4 fw-bold mb-1 text-dark">Welcome back, Admin 👋</h2>
+              <p class="text-muted small mb-0">Here is the real-time summary of your store's inventory and sales today.</p>
+            </div>
+            <div class="col-12 col-md-auto d-flex flex-wrap gap-2">
+              <button class="btn btn-primary btn-sm px-3 shadow-sm d-flex align-items-center gap-1 nav-link-btn" data-target="pos">
+                <i class="bi bi-plus-circle"></i> Create Bill
+              </button>
+              <button class="btn btn-outline-primary btn-sm px-3 shadow-sm d-flex align-items-center gap-1" data-bs-toggle="modal" data-bs-target="#product-modal" id="dash-add-product-btn">
+                <i class="bi bi-box-seam"></i> Add Product
+              </button>
+              <button class="btn btn-outline-secondary btn-sm px-3 shadow-sm d-flex align-items-center gap-1" data-bs-toggle="modal" data-bs-target="#stock-modal" id="dash-quick-stock-btn">
+                <i class="bi bi-arrow-left-right"></i> Stock In/Out
+              </button>
+            </div>
+          </div>
+
+          <!-- Stat KPI Cards -->
+          <div class="row g-3 mb-4">
+            <!-- Total Products -->
+            <div class="col-6 col-lg-4 col-xl-2">
+              <div class="card border-0 shadow-sm rounded-3 stat-card h-100">
+                <div class="card-body p-3">
+                  <div class="d-flex align-items-center justify-content-between mb-2">
+                    <span class="text-muted small fw-medium">Total Products</span>
+                    <div class="stat-icon bg-primary-subtle text-primary rounded-2 p-2">
+                      <i class="bi bi-box-seam fs-5"></i>
+                    </div>
+                  </div>
+                  <h3 class="h4 fw-bold text-dark mb-0" id="stat-total-products">0</h3>
+                  <small class="text-success small fw-semibold"><i class="bi bi-check-circle"></i> Active catalog</small>
+                </div>
+              </div>
+            </div>
+
+            <!-- Today's Sales -->
+            <div class="col-6 col-lg-4 col-xl-2">
+              <div class="card border-0 shadow-sm rounded-3 stat-card h-100">
+                <div class="card-body p-3">
+                  <div class="d-flex align-items-center justify-content-between mb-2">
+                    <span class="text-muted small fw-medium">Today's Sales</span>
+                    <div class="stat-icon bg-success-subtle text-success rounded-2 p-2">
+                      <i class="bi bi-currency-rupee fs-5"></i>
+                    </div>
+                  </div>
+                  <h3 class="h4 fw-bold text-dark mb-0" id="stat-today-sales">₹0.00</h3>
+                  <small class="text-muted small" id="stat-today-bills-count">0 bills today</small>
+                </div>
+              </div>
+            </div>
+
+            <!-- Low-Stock Alerts -->
+            <div class="col-6 col-lg-4 col-xl-2">
+              <div class="card border-0 shadow-sm rounded-3 stat-card h-100">
+                <div class="card-body p-3">
+                  <div class="d-flex align-items-center justify-content-between mb-2">
+                    <span class="text-muted small fw-medium">Low Stock</span>
+                    <div class="stat-icon bg-warning-subtle text-warning rounded-2 p-2">
+                      <i class="bi bi-exclamation-triangle fs-5"></i>
+                    </div>
+                  </div>
+                  <h3 class="h4 fw-bold text-danger mb-0" id="stat-low-stock">0</h3>
+                  <small class="text-danger small fw-semibold" id="stat-out-of-stock">0 out of stock</small>
+                </div>
+              </div>
+            </div>
+
+            <!-- Total Bills -->
+            <div class="col-6 col-lg-4 col-xl-2">
+              <div class="card border-0 shadow-sm rounded-3 stat-card h-100">
+                <div class="card-body p-3">
+                  <div class="d-flex align-items-center justify-content-between mb-2">
+                    <span class="text-muted small fw-medium">Total Invoices</span>
+                    <div class="stat-icon bg-info-subtle text-info rounded-2 p-2">
+                      <i class="bi bi-receipt fs-5"></i>
+                    </div>
+                  </div>
+                  <h3 class="h4 fw-bold text-dark mb-0" id="stat-total-bills">0</h3>
+                  <small class="text-muted small">Generated to date</small>
+                </div>
+              </div>
+            </div>
+
+            <!-- Inventory Valuation -->
+            <div class="col-6 col-lg-4 col-xl-2">
+              <div class="card border-0 shadow-sm rounded-3 stat-card h-100">
+                <div class="card-body p-3">
+                  <div class="d-flex align-items-center justify-content-between mb-2">
+                    <span class="text-muted small fw-medium">Inventory Value</span>
+                    <div class="stat-icon bg-purple-subtle text-purple rounded-2 p-2">
+                      <i class="bi bi-wallet2 fs-5"></i>
+                    </div>
+                  </div>
+                  <h3 class="h4 fw-bold text-dark mb-0" id="stat-inventory-value">₹0</h3>
+                  <small class="text-muted small">At cost price</small>
+                </div>
+              </div>
+            </div>
+
+            <!-- Total Revenue -->
+            <div class="col-6 col-lg-4 col-xl-2">
+              <div class="card border-0 shadow-sm rounded-3 stat-card h-100">
+                <div class="card-body p-3">
+                  <div class="d-flex align-items-center justify-content-between mb-2">
+                    <span class="text-muted small fw-medium">Total Revenue</span>
+                    <div class="stat-icon bg-indigo-subtle text-indigo rounded-2 p-2">
+                      <i class="bi bi-cash-stack fs-5"></i>
+                    </div>
+                  </div>
+                  <h3 class="h4 fw-bold text-primary mb-0" id="stat-total-revenue">₹0.00</h3>
+                  <small class="text-success small fw-semibold"><i class="bi bi-arrow-up-right"></i> All-time</small>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Charts Row -->
+          <div class="row g-3 mb-4">
+            <!-- Sales Trends Chart -->
+            <div class="col-12 col-xl-8">
+              <div class="card border-0 shadow-sm rounded-3 h-100">
+                <div class="card-header bg-white border-bottom py-3 d-flex align-items-center justify-content-between flex-wrap gap-2">
+                  <div>
+                    <h6 class="mb-0 fw-bold text-dark"><i class="bi bi-graph-up text-primary me-2"></i>Sales Performance</h6>
+                    <small class="text-muted">Dynamic revenue breakdown over time</small>
+                  </div>
+                  <div class="btn-group btn-group-sm" role="group" id="dashboard-chart-period-group">
+                    <button type="button" class="btn btn-outline-primary active" data-period="daily">Daily (7D)</button>
+                    <button type="button" class="btn btn-outline-primary" data-period="weekly">Weekly (4W)</button>
+                    <button type="button" class="btn btn-outline-primary" data-period="monthly">Monthly (6M)</button>
+                  </div>
+                </div>
+                <div class="card-body p-3">
+                  <div style="height: 280px; position: relative;">
+                    <canvas id="dashboard-sales-chart"></canvas>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Payment Method Doughnut Chart -->
+            <div class="col-12 col-xl-4">
+              <div class="card border-0 shadow-sm rounded-3 h-100">
+                <div class="card-header bg-white border-bottom py-3">
+                  <h6 class="mb-0 fw-bold text-dark"><i class="bi bi-pie-chart text-primary me-2"></i>Payment Breakdown</h6>
+                  <small class="text-muted">Revenue by payment methods</small>
+                </div>
+                <div class="card-body p-3 d-flex flex-column align-items-center justify-content-center">
+                  <div style="height: 220px; width: 100%; position: relative;">
+                    <canvas id="dashboard-payment-chart"></canvas>
+                  </div>
+                  <div id="dash-payment-legend" class="mt-2 w-100 small d-flex justify-content-around text-center"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Bottom Row: Best Sellers & Low-Stock Alerts & Recent Transactions -->
+          <div class="row g-3">
+            <!-- Best-Selling Products -->
+            <div class="col-12 col-lg-6 col-xl-4">
+              <div class="card border-0 shadow-sm rounded-3 h-100">
+                <div class="card-header bg-white border-bottom py-3 d-flex align-items-center justify-content-between">
+                  <h6 class="mb-0 fw-bold text-dark"><i class="bi bi-fire text-danger me-2"></i>Top Selling Products</h6>
+                  <span class="badge bg-light text-muted border">Units Sold</span>
+                </div>
+                <div class="card-body p-0">
+                  <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0 small" id="dash-bestsellers-table">
+                      <thead class="table-light">
+                        <tr>
+                          <th>#</th>
+                          <th>Product</th>
+                          <th class="text-center">Sold</th>
+                          <th class="text-end">Revenue</th>
+                        </tr>
+                      </thead>
+                      <tbody id="dash-bestsellers-tbody">
+                        <!-- Populated by JS -->
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Low-Stock Alerts Table -->
+            <div class="col-12 col-lg-6 col-xl-4">
+              <div class="card border-0 shadow-sm rounded-3 h-100">
+                <div class="card-header bg-white border-bottom py-3 d-flex align-items-center justify-content-between">
+                  <h6 class="mb-0 fw-bold text-dark"><i class="bi bi-exclamation-octagon text-warning me-2"></i>Low Stock Watchlist</h6>
+                  <button class="btn btn-link btn-sm text-decoration-none p-0 nav-link-btn" data-target="inventory">View All</button>
+                </div>
+                <div class="card-body p-0">
+                  <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0 small" id="dash-lowstock-table">
+                      <thead class="table-light">
+                        <tr>
+                          <th>Item</th>
+                          <th>In Stock</th>
+                          <th>Status</th>
+                          <th class="text-end">Action</th>
+                        </tr>
+                      </thead>
+                      <tbody id="dash-lowstock-tbody">
+                        <!-- Populated by JS -->
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Recent Bills / Transactions -->
+            <div class="col-12 col-lg-12 col-xl-4">
+              <div class="card border-0 shadow-sm rounded-3 h-100">
+                <div class="card-header bg-white border-bottom py-3 d-flex align-items-center justify-content-between">
+                  <h6 class="mb-0 fw-bold text-dark"><i class="bi bi-clock-history text-primary me-2"></i>Recent Invoices</h6>
+                  <button class="btn btn-link btn-sm text-decoration-none p-0 nav-link-btn" data-target="sales">History</button>
+                </div>
+                <div class="card-body p-0">
+                  <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0 small" id="dash-recent-bills-table">
+                      <thead class="table-light">
+                        <tr>
+                          <th>Bill #</th>
+                          <th>Customer</th>
+                          <th class="text-end">Amount</th>
+                          <th class="text-center">Receipt</th>
+                        </tr>
+                      </thead>
+                      <tbody id="dash-recent-bills-tbody">
+                        <!-- Populated by JS -->
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ============================================================ -->
+        <!-- 2. PRODUCT MANAGEMENT VIEW -->
+        <!-- ============================================================ -->
+        <section id="view-products" class="app-view d-none">
+          <div class="card border-0 shadow-sm rounded-3">
+            <!-- Header & Action Buttons -->
+            <div class="card-header bg-white border-bottom p-3">
+              <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3">
+                <div>
+                  <h5 class="mb-1 fw-bold text-dark"><i class="bi bi-box-seam text-primary me-2"></i>Product Catalog</h5>
+                  <p class="text-muted small mb-0">Manage product inventory, pricing, barcodes, and stock levels.</p>
+                </div>
+                <div class="d-flex flex-wrap gap-2">
+                  <button class="btn btn-outline-secondary btn-sm d-flex align-items-center gap-1" id="export-products-csv-btn">
+                    <i class="bi bi-download"></i> Export CSV
+                  </button>
+                  <button class="btn btn-primary btn-sm px-3 d-flex align-items-center gap-1 shadow-sm" data-bs-toggle="modal" data-bs-target="#product-modal" id="add-product-btn">
+                    <i class="bi bi-plus-lg"></i> Add New Product
+                  </button>
+                </div>
+              </div>
+
+              <!-- Live Supabase Status Alert Banner -->
+              <div id="supabase-products-alert" class="alert alert-info py-2 px-3 mt-3 mb-0 d-flex align-items-center justify-content-between small d-none">
+                <div class="d-flex align-items-center gap-2">
+                  <i class="bi bi-database-check fs-5 text-primary"></i>
+                  <div>
+                    <strong id="supabase-products-alert-title">Live Supabase Database:</strong>
+                    <span id="supabase-products-alert-text">Syncing with remote database...</span>
+                  </div>
+                </div>
+                <button class="btn btn-sm btn-outline-primary py-0 px-2" data-bs-toggle="modal" data-bs-target="#supabase-auth-modal">
+                  <i class="bi bi-key me-1"></i> Staff Auth & Status
+                </button>
+              </div>
+
+              <!-- Search and Filter Bar -->
+              <div class="row g-2 mt-3 pt-2 border-top">
+                <!-- Search input -->
+                <div class="col-12 col-md-4">
+                  <div class="input-group input-group-sm">
+                    <span class="input-group-text bg-light border-end-0"><i class="bi bi-search text-muted"></i></span>
+                    <input type="text" id="prod-search-input" class="form-control bg-light border-start-0" placeholder="Search by name, ID, barcode, supplier...">
+                  </div>
+                </div>
+
+                <!-- Category filter -->
+                <div class="col-6 col-md-3">
+                  <select id="prod-category-filter" class="form-select form-select-sm">
+                    <option value="">All Categories</option>
+                    <!-- Populated dynamically -->
+                  </select>
+                </div>
+
+                <!-- Stock status filter -->
+                <div class="col-6 col-md-2">
+                  <select id="prod-status-filter" class="form-select form-select-sm">
+                    <option value="">All Stock Status</option>
+                    <option value="in-stock">In Stock</option>
+                    <option value="low-stock">Low Stock</option>
+                    <option value="out-of-stock">Out of Stock</option>
+                  </select>
+                </div>
+
+                <!-- Sort By -->
+                <div class="col-12 col-md-3">
+                  <select id="prod-sort-filter" class="form-select form-select-sm">
+                    <option value="name-asc">Sort: Name (A-Z)</option>
+                    <option value="name-desc">Sort: Name (Z-A)</option>
+                    <option value="price-asc">Sort: Price (Low to High)</option>
+                    <option value="price-desc">Sort: Price (High to Low)</option>
+                    <option value="stock-asc">Sort: Stock (Low to High)</option>
+                    <option value="stock-desc">Sort: Stock (High to Low)</option>
+                    <option value="expiry-asc">Sort: Expiry (Nearest)</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <!-- Products Table -->
+            <div class="card-body p-0">
+              <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0" id="products-table">
+                  <thead class="table-light">
+                    <tr>
+                      <th class="ps-3">ID / Barcode</th>
+                      <th>Product Name</th>
+                      <th>Category</th>
+                      <th class="text-end">Cost Price</th>
+                      <th class="text-end">Selling Price</th>
+                      <th class="text-center">Stock</th>
+                      <th>Min Level</th>
+                      <th>Supplier</th>
+                      <th>Expiry</th>
+                      <th class="text-end pe-3">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody id="products-tbody">
+                    <!-- Populated by JS -->
+                  </tbody>
+                </table>
+              </div>
+              
+              <!-- Empty State -->
+              <div id="products-empty" class="text-center py-5 d-none">
+                <i class="bi bi-box-seam display-4 text-muted mb-3 d-block"></i>
+                <h6 class="fw-semibold text-secondary">No products found</h6>
+                <p class="text-muted small">Try adjusting your search criteria or add a new product.</p>
+              </div>
+            </div>
+
+            <!-- Table Footer & Pagination -->
+            <div class="card-footer bg-white border-top p-3 d-flex flex-column flex-sm-row align-items-center justify-content-between gap-2">
+              <div class="small text-muted" id="products-count-info">
+                Showing 1 to 10 of 15 products
+              </div>
+              <div class="d-flex align-items-center gap-2">
+                <select id="products-per-page" class="form-select form-select-sm w-auto">
+                  <option value="5">5 per page</option>
+                  <option value="10" selected>10 per page</option>
+                  <option value="20">20 per page</option>
+                  <option value="50">50 per page</option>
+                </select>
+                <nav aria-label="Products pagination">
+                  <ul class="pagination pagination-sm mb-0" id="products-pagination">
+                    <!-- Populated by JS -->
+                  </ul>
+                </nav>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ============================================================ -->
+        <!-- 3. INVENTORY MANAGEMENT VIEW -->
+        <!-- ============================================================ -->
+        <section id="view-inventory" class="app-view d-none">
+          <!-- Summary Valuation Cards -->
+          <div class="row g-3 mb-4">
+            <div class="col-12 col-md-4">
+              <div class="card border-0 shadow-sm rounded-3 p-3 bg-white">
+                <div class="d-flex align-items-center justify-content-between">
+                  <div>
+                    <span class="text-muted small fw-medium">Total Items in Stock</span>
+                    <h3 class="h4 fw-bold text-dark mb-0 mt-1" id="inv-total-units">0 Units</h3>
+                  </div>
+                  <div class="bg-primary-subtle text-primary p-3 rounded-circle">
+                    <i class="bi bi-boxes fs-4"></i>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-12 col-md-4">
+              <div class="card border-0 shadow-sm rounded-3 p-3 bg-white">
+                <div class="d-flex align-items-center justify-content-between">
+                  <div>
+                    <span class="text-muted small fw-medium">Total Cost Valuation</span>
+                    <h3 class="h4 fw-bold text-dark mb-0 mt-1" id="inv-cost-value">₹0.00</h3>
+                  </div>
+                  <div class="bg-info-subtle text-info p-3 rounded-circle">
+                    <i class="bi bi-calculator fs-4"></i>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-12 col-md-4">
+              <div class="card border-0 shadow-sm rounded-3 p-3 bg-white">
+                <div class="d-flex align-items-center justify-content-between">
+                  <div>
+                    <span class="text-muted small fw-medium">Retail Valuation (Est. Profit)</span>
+                    <h3 class="h4 fw-bold text-success mb-0 mt-1" id="inv-retail-value">₹0.00</h3>
+                  </div>
+                  <div class="bg-success-subtle text-success p-3 rounded-circle">
+                    <i class="bi bi-graph-up fs-4"></i>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Inventory Actions & Tabs -->
+          <div class="card border-0 shadow-sm rounded-3">
+            <div class="card-header bg-white border-bottom p-3">
+              <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3">
+                <ul class="nav nav-tabs card-header-tabs" id="inventory-tab" role="tablist">
+                  <li class="nav-item">
+                    <button class="nav-link active fw-semibold" id="stock-levels-tab" data-bs-toggle="tab" data-bs-target="#tab-stock-levels" type="button" role="tab">
+                      <i class="bi bi-stack me-1"></i> Stock Levels
+                    </button>
+                  </li>
+                  <li class="nav-item">
+                    <button class="nav-link fw-semibold" id="stock-history-tab" data-bs-toggle="tab" data-bs-target="#tab-stock-history" type="button" role="tab">
+                      <i class="bi bi-clock-history me-1"></i> Movement Audit History
+                    </button>
+                  </li>
+                </ul>
+                <div class="d-flex gap-2">
+                  <button class="btn btn-success btn-sm d-flex align-items-center gap-1 shadow-sm" data-bs-toggle="modal" data-bs-target="#stock-modal" data-type="IN">
+                    <i class="bi bi-box-arrow-in-down"></i> Stock In (Restock)
+                  </button>
+                  <button class="btn btn-warning btn-sm text-dark d-flex align-items-center gap-1 shadow-sm" data-bs-toggle="modal" data-bs-target="#stock-modal" data-type="OUT">
+                    <i class="bi bi-box-arrow-up"></i> Stock Out / Adjust
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div class="card-body p-0">
+              <div class="tab-content" id="inventoryTabContent">
+                
+                <!-- TAB 1: Current Stock Levels -->
+                <div class="tab-pane fade show active p-3" id="tab-stock-levels" role="tabpanel">
+                  <!-- Search and Status Filters -->
+                  <div class="row g-2 mb-3">
+                    <div class="col-12 col-md-6">
+                      <input type="text" id="inv-search-input" class="form-control form-control-sm" placeholder="Filter inventory by name, category, or barcode...">
+                    </div>
+                    <div class="col-6 col-md-3">
+                      <select id="inv-category-filter" class="form-select form-select-sm">
+                        <option value="">All Categories</option>
+                      </select>
+                    </div>
+                    <div class="col-6 col-md-3">
+                      <select id="inv-status-filter" class="form-select form-select-sm">
+                        <option value="">All Stock Status</option>
+                        <option value="in-stock">In Stock</option>
+                        <option value="low-stock">Low Stock Alerts Only</option>
+                        <option value="out-of-stock">Out of Stock Only</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0" id="inventory-table">
+                      <thead class="table-light">
+                        <tr>
+                          <th>Barcode</th>
+                          <th>Product Name</th>
+                          <th>Category</th>
+                          <th class="text-center">Current Stock</th>
+                          <th class="text-center">Min Level</th>
+                          <th>Status</th>
+                          <th class="text-end">Cost Valuation</th>
+                          <th class="text-end">Retail Valuation</th>
+                          <th class="text-end">Quick Adjust</th>
+                        </tr>
+                      </thead>
+                      <tbody id="inventory-tbody">
+                        <!-- Populated by JS -->
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+
+                <!-- TAB 2: Movement Audit History -->
+                <div class="tab-pane fade p-3" id="tab-stock-history" role="tabpanel">
+                  <div class="d-flex justify-content-between align-items-center mb-3">
+                    <input type="text" id="movement-search-input" class="form-control form-control-sm w-50" placeholder="Search audit history by product, bill #, or reason...">
+                    <button class="btn btn-outline-secondary btn-sm" id="export-movements-csv-btn">
+                      <i class="bi bi-download"></i> Export Logs (CSV)
+                    </button>
+                  </div>
+                  <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0 small" id="movements-table">
+                      <thead class="table-light">
+                        <tr>
+                          <th>Timestamp</th>
+                          <th>Product</th>
+                          <th>Movement Type</th>
+                          <th class="text-center">Change Qty</th>
+                          <th class="text-center">Stock Path</th>
+                          <th>Reason / Reference</th>
+                        </tr>
+                      </thead>
+                      <tbody id="movements-tbody">
+                        <!-- Populated by JS -->
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ============================================================ -->
+        <!-- 4. BARCODE SCANNING VIEW -->
+        <!-- ============================================================ -->
+        <section id="view-scanner" class="app-view d-none">
+          <div class="row g-4">
+            <!-- Left: Scanner Controller Card -->
+            <div class="col-12 col-lg-6">
+              <div class="card border-0 shadow-sm rounded-3 h-100">
+                <div class="card-header bg-white border-bottom p-3">
+                  <h5 class="mb-0 fw-bold text-dark"><i class="bi bi-upc-scan text-primary me-2"></i>Barcode Scanner Terminal</h5>
+                  <small class="text-muted">Supports USB handheld hardware scanners & manual entry</small>
+                </div>
+                <div class="card-body p-4 text-center">
+                  
+                  <!-- Animated Scanner Graphic -->
+                  <div class="scanner-box mx-auto mb-4 position-relative p-4 rounded-4 bg-light border d-flex flex-column align-items-center justify-content-center" style="max-width: 380px; height: 180px; overflow: hidden;">
+                    <i class="bi bi-upc display-1 text-secondary opacity-50"></i>
+                    <div class="scanner-laser-line"></div>
+                    <span class="badge bg-primary-subtle text-primary mt-2 border border-primary-subtle"><i class="bi bi-broadcast me-1"></i> Scanner Ready</span>
+                  </div>
+
+                  <!-- Scanner Form Input -->
+                  <form id="barcode-scan-form" class="mb-4">
+                    <div class="input-group input-group-lg shadow-sm">
+                      <span class="input-group-text bg-white border-end-0 text-primary"><i class="bi bi-upc-scan fs-4"></i></span>
+                      <input type="text" id="barcode-input" class="form-control border-start-0 fs-5" placeholder="Scan or enter barcode / SKU..." autocomplete="off" autofocus>
+                      <button class="btn btn-primary px-4 fw-semibold" type="submit">Lookup</button>
+                    </div>
+                    <small class="text-muted d-block mt-2">
+                      <i class="bi bi-info-circle me-1"></i> Point your hardware USB scanner here or type the barcode and press <strong>Enter</strong>.
+                    </small>
+                  </form>
+
+                  <!-- Quick Sample Barcode Pills for fast demo testing -->
+                  <div class="text-start border-top pt-3">
+                    <label class="form-label small fw-bold text-muted text-uppercase mb-2">Demo Quick-Scan Barcodes:</label>
+                    <div class="d-flex flex-wrap gap-2" id="sample-barcode-pills">
+                      <!-- Populated by JS -->
+                    </div>
+                  </div>
+
+                </div>
+              </div>
+            </div>
+
+            <!-- Right: Scanned Product Info Display Card -->
+            <div class="col-12 col-lg-6">
+              <div class="card border-0 shadow-sm rounded-3 h-100" id="scanner-result-card">
+                <div class="card-header bg-white border-bottom p-3 d-flex align-items-center justify-content-between">
+                  <h6 class="mb-0 fw-bold text-dark"><i class="bi bi-info-circle text-primary me-2"></i>Product Lookup Details</h6>
+                  <span id="scanner-status-badge" class="badge bg-secondary-subtle text-secondary">Awaiting Scan</span>
+                </div>
+                <div class="card-body p-4">
+                  
+                  <!-- Blank State before scan -->
+                  <div id="scanner-empty-state" class="text-center py-5">
+                    <div class="display-3 text-muted mb-3"><i class="bi bi-upc"></i></div>
+                    <h6 class="text-secondary fw-semibold">No barcode scanned yet</h6>
+                    <p class="text-muted small">Scan any product barcode or click one of the quick test barcodes on the left.</p>
+                  </div>
+
+                  <!-- Scanned Product Found Card -->
+                  <div id="scanner-product-details" class="d-none">
+                    <div class="d-flex align-items-center justify-content-between pb-3 border-bottom mb-3">
+                      <div>
+                        <span class="badge bg-primary-subtle text-primary mb-1" id="scan-res-category">Groceries</span>
+                        <h4 class="fw-bold mb-0 text-dark" id="scan-res-name">Product Name</h4>
+                        <small class="text-muted font-monospace" id="scan-res-barcode">8901030000000</small>
+                      </div>
+                      <div class="text-end">
+                        <span class="text-muted small d-block">Selling Price</span>
+                        <h3 class="h3 fw-bold text-primary mb-0" id="scan-res-price">₹0.00</h3>
+                      </div>
+                    </div>
+
+                    <div class="row g-3 mb-4">
+                      <div class="col-6">
+                        <div class="p-3 bg-light rounded-3">
+                          <small class="text-muted d-block">Available Stock</small>
+                          <span class="fs-5 fw-bold" id="scan-res-stock">0 Units</span>
+                          <div id="scan-res-stock-badge" class="mt-1"></div>
+                        </div>
+                      </div>
+                      <div class="col-6">
+                        <div class="p-3 bg-light rounded-3">
+                          <small class="text-muted d-block">Purchase Cost</small>
+                          <span class="fs-5 fw-bold text-secondary" id="scan-res-cost">₹0.00</span>
+                          <small class="text-muted d-block mt-1">Margin: <span id="scan-res-margin" class="text-success fw-bold">0%</span></small>
+                        </div>
+                      </div>
+                      <div class="col-6">
+                        <div class="p-3 bg-light rounded-3">
+                          <small class="text-muted d-block">Supplier</small>
+                          <span class="fw-semibold text-dark" id="scan-res-supplier">--</span>
+                        </div>
+                      </div>
+                      <div class="col-6">
+                        <div class="p-3 bg-light rounded-3">
+                          <small class="text-muted d-block">Expiry Date</small>
+                          <span class="fw-semibold text-dark" id="scan-res-expiry">--</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Action buttons -->
+                    <div class="d-grid gap-2">
+                      <button class="btn btn-primary py-2 fw-semibold d-flex align-items-center justify-content-center gap-2" id="scan-add-to-cart-btn">
+                        <i class="bi bi-cart-plus fs-5"></i> Add to Billing Cart
+                      </button>
+                      <button class="btn btn-outline-secondary d-flex align-items-center justify-content-center gap-2" id="scan-quick-stock-btn">
+                        <i class="bi bi-box-arrow-in-down"></i> Quick Restock Product
+                      </button>
+                    </div>
+                  </div>
+
+                  <!-- Unknown Barcode Alert State -->
+                  <div id="scanner-unknown-state" class="d-none text-center py-4">
+                    <div class="display-3 text-warning mb-2"><i class="bi bi-exclamation-triangle"></i></div>
+                    <h5 class="fw-bold text-dark">Barcode Not Registered!</h5>
+                    <p class="text-muted small mb-3">No product in your inventory matches barcode: <strong id="scan-unknown-code" class="text-danger font-monospace">--</strong></p>
+                    <button class="btn btn-primary" id="scan-create-product-btn">
+                      <i class="bi bi-plus-lg me-1"></i> Register as New Product
+                    </button>
+                  </div>
+
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ============================================================ -->
+        <!-- 5. BILLING SYSTEM / POS VIEW -->
+        <!-- ============================================================ -->
+        <section id="view-pos" class="app-view d-none">
+          <div class="row g-3">
+            
+            <!-- LEFT COLUMN: Product Catalog & Fast Picker -->
+            <div class="col-12 col-xl-7">
+              <div class="card border-0 shadow-sm rounded-3 h-100">
+                <div class="card-header bg-white border-bottom p-3">
+                  <!-- Search and Barcode quick-entry -->
+                  <div class="row g-2 mb-2">
+                    <div class="col-12 col-md-7">
+                      <div class="input-group input-group-sm">
+                        <span class="input-group-text bg-light border-end-0"><i class="bi bi-search text-muted"></i></span>
+                        <input type="text" id="pos-search-input" class="form-control bg-light border-start-0" placeholder="Search product by name or SKU...">
+                      </div>
+                    </div>
+                    <div class="col-12 col-md-5">
+                      <div class="input-group input-group-sm">
+                        <span class="input-group-text bg-light border-end-0"><i class="bi bi-upc-scan text-primary"></i></span>
+                        <input type="text" id="pos-barcode-input" class="form-control bg-light border-start-0" placeholder="Fast scan barcode + Enter" autocomplete="off">
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Category Filter Pills -->
+                  <div class="d-flex gap-1 overflow-x-auto py-1" id="pos-category-pills">
+                    <button class="btn btn-sm btn-primary active rounded-pill px-3 py-1 text-nowrap" data-category="">All Items</button>
+                    <!-- Populated dynamically -->
+                  </div>
+                </div>
+
+                <!-- Products Grid -->
+                <div class="card-body p-3 overflow-y-auto" style="max-height: 600px;">
+                  <div class="row g-3" id="pos-products-grid">
+                    <!-- Populated by JS -->
+                  </div>
+                  <!-- POS Empty State -->
+                  <div id="pos-grid-empty" class="text-center py-5 d-none">
+                    <i class="bi bi-search display-4 text-muted mb-2 d-block"></i>
+                    <h6 class="text-secondary fw-semibold">No matching products found</h6>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- RIGHT COLUMN: Shopping Cart & Checkout -->
+            <div class="col-12 col-xl-5">
+              <div class="card border-0 shadow-sm rounded-3 pos-cart-card sticky-top" style="top: 80px;">
+                <!-- Cart Header -->
+                <div class="card-header bg-primary text-white p-3 rounded-top-3 d-flex align-items-center justify-content-between">
+                  <div>
+                    <h6 class="mb-0 fw-bold"><i class="bi bi-cart3 me-1"></i> Current Bill</h6>
+                    <small class="opacity-75 font-monospace" id="pos-current-bill-no">#BILL-1001</small>
+                  </div>
+                  <div class="d-flex align-items-center gap-2">
+                    <span class="badge bg-white text-primary fw-bold" id="pos-cart-badge">0 Items</span>
+                    <button class="btn btn-sm btn-outline-light py-0 px-2" id="pos-clear-cart-btn" title="Clear Cart">
+                      <i class="bi bi-trash3"></i>
+                    </button>
+                  </div>
+                </div>
+
+                <div class="card-body p-3">
+                  <!-- Optional Customer Details Accordion/Inputs -->
+                  <div class="mb-3 p-2 bg-light rounded-3 border">
+                    <div class="row g-2">
+                      <div class="col-6">
+                        <input type="text" id="pos-customer-name" class="form-control form-control-sm" placeholder="Customer Name (Optional)">
+                      </div>
+                      <div class="col-6">
+                        <input type="tel" id="pos-customer-phone" class="form-control form-control-sm" placeholder="Phone Number (Optional)">
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Cart Items Table -->
+                  <div class="pos-cart-items-container overflow-y-auto mb-3" style="max-height: 250px;">
+                    <table class="table table-sm align-middle mb-0" id="pos-cart-table">
+                      <thead class="table-light sticky-top">
+                        <tr class="small">
+                          <th>Item</th>
+                          <th class="text-center" style="width: 110px;">Qty</th>
+                          <th class="text-end">Price</th>
+                          <th class="text-end">Total</th>
+                          <th></th>
+                        </tr>
+                      </thead>
+                      <tbody id="pos-cart-tbody">
+                        <!-- Populated dynamically -->
+                      </tbody>
+                    </table>
+
+                    <!-- Cart Empty State -->
+                    <div id="pos-cart-empty" class="text-center py-4">
+                      <i class="bi bi-cart-x display-4 text-muted mb-2 d-block"></i>
+                      <p class="text-muted small mb-0">Cart is empty. Select products on the left or scan a barcode.</p>
+                    </div>
+                  </div>
+
+                  <!-- Cart Calculations Summary -->
+                  <div class="border-top pt-2">
+                    <!-- Subtotal -->
+                    <div class="d-flex justify-content-between text-muted small mb-1">
+                      <span>Subtotal:</span>
+                      <span id="pos-calc-subtotal" class="fw-semibold">₹0.00</span>
+                    </div>
+
+                    <!-- Discount Control -->
+                    <div class="row g-1 align-items-center mb-1">
+                      <div class="col-4">
+                        <span class="text-muted small">Discount:</span>
+                      </div>
+                      <div class="col-4">
+                        <select id="pos-discount-type" class="form-select form-select-sm py-0">
+                          <option value="percent">% Off</option>
+                          <option value="fixed">₹ Flat</option>
+                        </select>
+                      </div>
+                      <div class="col-4">
+                        <input type="number" id="pos-discount-val" class="form-control form-control-sm text-end py-0" value="0" min="0" max="100">
+                      </div>
+                    </div>
+
+                    <!-- GST Tax Rate Control -->
+                    <div class="row g-1 align-items-center mb-2">
+                      <div class="col-6">
+                        <span class="text-muted small">GST (<span id="pos-gst-label">5%</span>):</span>
+                      </div>
+                      <div class="col-3">
+                        <select id="pos-gst-select" class="form-select form-select-sm py-0">
+                          <option value="0">0%</option>
+                          <option value="5" selected>5%</option>
+                          <option value="12">12%</option>
+                          <option value="18">18%</option>
+                          <option value="28">28%</option>
+                        </select>
+                      </div>
+                      <div class="col-3 text-end">
+                        <span id="pos-calc-gst" class="small fw-semibold">₹0.00</span>
+                      </div>
+                    </div>
+
+                    <!-- Grand Total Banner -->
+                    <div class="d-flex justify-content-between align-items-center bg-primary-subtle p-2 rounded-3 mb-3 border border-primary-subtle">
+                      <span class="fw-bold text-primary">Final Payable:</span>
+                      <h4 class="mb-0 fw-bold text-primary" id="pos-calc-grand-total">₹0.00</h4>
+                    </div>
+
+                    <!-- Payment Mode Selector -->
+                    <div class="mb-3">
+                      <label class="form-label small fw-bold text-muted mb-1">Payment Method:</label>
+                      <div class="btn-group w-100" role="group" id="pos-payment-mode-group">
+                        <input type="radio" class="btn-check" name="paymentMode" id="pay-cash" value="Cash" checked>
+                        <label class="btn btn-outline-primary btn-sm fw-semibold" for="pay-cash"><i class="bi bi-cash me-1"></i> Cash</label>
+
+                        <input type="radio" class="btn-check" name="paymentMode" id="pay-upi" value="UPI">
+                        <label class="btn btn-outline-primary btn-sm fw-semibold" for="pay-upi"><i class="bi bi-qr-code-scan me-1"></i> UPI</label>
+
+                        <input type="radio" class="btn-check" name="paymentMode" id="pay-card" value="Card">
+                        <label class="btn btn-outline-primary btn-sm fw-semibold" for="pay-card"><i class="bi bi-credit-card me-1"></i> Card</label>
+                      </div>
+                    </div>
+
+                    <!-- Mode Specific Details: Cash Tendered & Change -->
+                    <div id="pos-cash-details" class="mb-3 p-2 bg-light rounded-3 border">
+                      <div class="row g-2 align-items-center mb-2">
+                        <div class="col-6">
+                          <label for="pos-cash-received" class="small text-muted mb-0">Cash Tendered (₹):</label>
+                          <input type="number" id="pos-cash-received" class="form-control form-control-sm text-end fw-bold" placeholder="0.00" min="0">
+                        </div>
+                        <div class="col-6 text-end">
+                          <small class="text-muted d-block">Change Due:</small>
+                          <span class="fs-5 fw-bold text-success" id="pos-change-due">₹0.00</span>
+                        </div>
+                      </div>
+                      <!-- Quick Cash Note Buttons -->
+                      <div class="d-flex gap-1 flex-wrap">
+                        <button type="button" class="btn btn-sm btn-white border px-2 py-0 small quick-cash-btn" data-amt="100">₹100</button>
+                        <button type="button" class="btn btn-sm btn-white border px-2 py-0 small quick-cash-btn" data-amt="200">₹200</button>
+                        <button type="button" class="btn btn-sm btn-white border px-2 py-0 small quick-cash-btn" data-amt="500">₹500</button>
+                        <button type="button" class="btn btn-sm btn-white border px-2 py-0 small quick-cash-btn" data-amt="2000">₹2000</button>
+                        <button type="button" class="btn btn-sm btn-primary-subtle text-primary border border-primary-subtle px-2 py-0 small" id="quick-cash-exact">Exact</button>
+                      </div>
+                    </div>
+
+                    <!-- Mode Specific Details: UPI Simulated QR -->
+                    <div id="pos-upi-details" class="mb-3 p-3 bg-light rounded-3 border text-center d-none">
+                      <div class="upi-qr-box bg-white p-2 d-inline-block border rounded-3 shadow-sm mb-2">
+                        <img src="https://api.qrserver.com/v1/create-qr-code/?size=130x130&data=upi://pay?pa=cartkaro@upi%26pn=CartKaro%26cu=INR" alt="UPI QR" class="img-fluid" id="pos-upi-qr-img" width="130" height="130">
+                      </div>
+                      <small class="d-block text-muted">Scan with Google Pay, PhonePe, or Paytm</small>
+                      <span class="badge bg-success-subtle text-success mt-1">UPI ID: cartkaro@okaxis</span>
+                    </div>
+
+                    <!-- Mode Specific Details: Card -->
+                    <div id="pos-card-details" class="mb-3 p-2 bg-light rounded-3 border d-none">
+                      <label for="pos-card-ref" class="small text-muted mb-1">Card Auth / Approval Code (Optional):</label>
+                      <input type="text" id="pos-card-ref" class="form-control form-control-sm" placeholder="e.g. TXN-894723">
+                    </div>
+
+                    <!-- Checkout Button -->
+                    <button class="btn btn-success btn-lg w-100 fw-bold shadow-sm d-flex align-items-center justify-content-center gap-2" id="pos-checkout-btn">
+                      <i class="bi bi-printer fs-5"></i> Complete Bill & Print
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </section>
+
+        <!-- ============================================================ -->
+        <!-- 6. SALES HISTORY VIEW -->
+        <!-- ============================================================ -->
+        <section id="view-sales" class="app-view d-none">
+          <div class="card border-0 shadow-sm rounded-3">
+            <div class="card-header bg-white border-bottom p-3">
+              <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3">
+                <div>
+                  <h5 class="mb-1 fw-bold text-dark"><i class="bi bi-clock-history text-primary me-2"></i>Sales & Billing History</h5>
+                  <p class="text-muted small mb-0">Search past customer receipts, print invoices, or manage returns.</p>
+                </div>
+                <button class="btn btn-outline-secondary btn-sm d-flex align-items-center gap-1" id="export-sales-csv-btn">
+                  <i class="bi bi-download"></i> Export Sales (CSV)
+                </button>
+              </div>
+
+              <!-- Search and Filter Bar -->
+              <div class="row g-2 mt-3 pt-2 border-top">
+                <div class="col-12 col-md-4">
+                  <div class="input-group input-group-sm">
+                    <span class="input-group-text bg-light border-end-0"><i class="bi bi-search text-muted"></i></span>
+                    <input type="text" id="sales-search-input" class="form-control bg-light border-start-0" placeholder="Search by Bill #, Customer name, Phone...">
+                  </div>
+                </div>
+                <div class="col-6 col-md-3">
+                  <select id="sales-date-filter" class="form-select form-select-sm">
+                    <option value="all">All Dates</option>
+                    <option value="today">Today</option>
+                    <option value="yesterday">Yesterday</option>
+                    <option value="week">Last 7 Days</option>
+                    <option value="month">This Month</option>
+                  </select>
+                </div>
+                <div class="col-6 col-md-2">
+                  <select id="sales-payment-filter" class="form-select form-select-sm">
+                    <option value="">All Payment Modes</option>
+                    <option value="Cash">Cash</option>
+                    <option value="UPI">UPI</option>
+                    <option value="Card">Card</option>
+                  </select>
+                </div>
+                <div class="col-12 col-md-3">
+                  <select id="sales-sort-filter" class="form-select form-select-sm">
+                    <option value="date-desc">Newest First</option>
+                    <option value="date-asc">Oldest First</option>
+                    <option value="amt-desc">Amount: High to Low</option>
+                    <option value="amt-asc">Amount: Low to High</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <!-- Sales Summary KPI Bar -->
+            <div class="bg-light px-3 py-2 border-bottom d-flex flex-wrap align-items-center justify-content-between small text-muted">
+              <div>Filtered Transactions: <strong class="text-dark" id="sales-summary-count">0</strong></div>
+              <div>Filtered Total Revenue: <strong class="text-primary fs-6" id="sales-summary-revenue">₹0.00</strong></div>
+              <div>Avg Ticket Size: <strong class="text-success" id="sales-summary-avg">₹0.00</strong></div>
+            </div>
+
+            <!-- Table of Bills -->
+            <div class="card-body p-0">
+              <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0" id="sales-table">
+                  <thead class="table-light">
+                    <tr>
+                      <th class="ps-3">Bill Number</th>
+                      <th>Date & Time</th>
+                      <th>Customer Details</th>
+                      <th class="text-center">Items</th>
+                      <th>Payment</th>
+                      <th class="text-end">Total Amount</th>
+                      <th>Status</th>
+                      <th class="text-end pe-3">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody id="sales-tbody">
+                    <!-- Populated by JS -->
+                  </tbody>
+                </table>
+              </div>
+
+              <!-- Empty State -->
+              <div id="sales-empty" class="text-center py-5 d-none">
+                <i class="bi bi-receipt display-4 text-muted mb-2 d-block"></i>
+                <h6 class="text-secondary fw-semibold">No bills found for the selected criteria</h6>
+              </div>
+            </div>
+
+            <!-- Table Pagination -->
+            <div class="card-footer bg-white border-top p-3 d-flex flex-column flex-sm-row align-items-center justify-content-between gap-2">
+              <div class="small text-muted" id="sales-count-info">
+                Showing 1 to 10 of 15 bills
+              </div>
+              <nav aria-label="Sales pagination">
+                <ul class="pagination pagination-sm mb-0" id="sales-pagination">
+                  <!-- Populated by JS -->
+                </ul>
+              </nav>
+            </div>
+          </div>
+        </section>
+
+        <!-- ============================================================ -->
+        <!-- 7. REPORTS & ANALYTICS VIEW -->
+        <!-- ============================================================ -->
+        <section id="view-reports" class="app-view d-none">
+          <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3 mb-4">
+            <div>
+              <h4 class="fw-bold mb-1 text-dark"><i class="bi bi-graph-up-arrow text-primary me-2"></i>Reports & Business Intelligence</h4>
+              <p class="text-muted small mb-0">Detailed charts, category share, inventory valuation, and sales metrics.</p>
+            </div>
+            <div class="d-flex gap-2">
+              <button class="btn btn-outline-secondary btn-sm" id="export-reports-csv-btn">
+                <i class="bi bi-download"></i> Export Analytics (CSV)
+              </button>
+              <button class="btn btn-primary btn-sm" onclick="window.print();">
+                <i class="bi bi-printer"></i> Print Report
+              </button>
+            </div>
+          </div>
+
+          <!-- Top Analytics KPI Cards -->
+          <div class="row g-3 mb-4">
+            <div class="col-6 col-lg-3">
+              <div class="card border-0 shadow-sm rounded-3 p-3 bg-white">
+                <span class="text-muted small">Gross Sales</span>
+                <h3 class="h4 fw-bold text-primary mb-0 mt-1" id="rep-gross-sales">₹0.00</h3>
+                <small class="text-muted small">All completed invoices</small>
+              </div>
+            </div>
+            <div class="col-6 col-lg-3">
+              <div class="card border-0 shadow-sm rounded-3 p-3 bg-white">
+                <span class="text-muted small">Estimated Profit Margin</span>
+                <h3 class="h4 fw-bold text-success mb-0 mt-1" id="rep-profit-margin">₹0.00</h3>
+                <small class="text-success small" id="rep-profit-pct">(0% Margin)</small>
+              </div>
+            </div>
+            <div class="col-6 col-lg-3">
+              <div class="card border-0 shadow-sm rounded-3 p-3 bg-white">
+                <span class="text-muted small">Average Bill Value</span>
+                <h3 class="h4 fw-bold text-dark mb-0 mt-1" id="rep-avg-bill">₹0.00</h3>
+                <small class="text-muted small">Per customer transaction</small>
+              </div>
+            </div>
+            <div class="col-6 col-lg-3">
+              <div class="card border-0 shadow-sm rounded-3 p-3 bg-white">
+                <span class="text-muted small">Total Stock Valuation</span>
+                <h3 class="h4 fw-bold text-indigo mb-0 mt-1" id="rep-stock-val">₹0.00</h3>
+                <small class="text-muted small">Cost basis in warehouse</small>
+              </div>
+            </div>
+          </div>
+
+          <!-- Charts Grid -->
+          <div class="row g-3 mb-4">
+            <!-- Full Width Revenue & Sales Trend Chart -->
+            <div class="col-12 col-xl-8">
+              <div class="card border-0 shadow-sm rounded-3 h-100">
+                <div class="card-header bg-white border-bottom py-3 d-flex align-items-center justify-content-between">
+                  <h6 class="mb-0 fw-bold text-dark"><i class="bi bi-bar-chart-line text-primary me-2"></i>Sales & Revenue Trend</h6>
+                  <span class="badge bg-primary-subtle text-primary">Monthly Progression</span>
+                </div>
+                <div class="card-body p-3">
+                  <div style="height: 300px; position: relative;">
+                    <canvas id="reports-sales-trend-chart"></canvas>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Category Sales Share Chart -->
+            <div class="col-12 col-xl-4">
+              <div class="card border-0 shadow-sm rounded-3 h-100">
+                <div class="card-header bg-white border-bottom py-3">
+                  <h6 class="mb-0 fw-bold text-dark"><i class="bi bi-pie-chart text-primary me-2"></i>Sales by Category</h6>
+                </div>
+                <div class="card-body p-3 d-flex flex-column align-items-center justify-content-center">
+                  <div style="height: 240px; width: 100%; position: relative;">
+                    <canvas id="reports-category-chart"></canvas>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Best vs Slow Moving Tables -->
+          <div class="row g-3">
+            <div class="col-12 col-lg-6">
+              <div class="card border-0 shadow-sm rounded-3">
+                <div class="card-header bg-white border-bottom py-3">
+                  <h6 class="mb-0 fw-bold text-success"><i class="bi bi-trophy me-2"></i>Top 5 Best-Selling Products</h6>
+                </div>
+                <div class="card-body p-0">
+                  <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0 small" id="rep-bestsellers-table">
+                      <thead class="table-light">
+                        <tr>
+                          <th>Product</th>
+                          <th>Category</th>
+                          <th class="text-center">Units Sold</th>
+                          <th class="text-end">Revenue (₹)</th>
+                        </tr>
+                      </thead>
+                      <tbody id="rep-bestsellers-tbody"></tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-12 col-lg-6">
+              <div class="card border-0 shadow-sm rounded-3">
+                <div class="card-header bg-white border-bottom py-3">
+                  <h6 class="mb-0 fw-bold text-muted"><i class="bi bi-hourglass-split me-2"></i>Slow-Moving Products</h6>
+                </div>
+                <div class="card-body p-0">
+                  <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0 small" id="rep-slowsellers-table">
+                      <thead class="table-light">
+                        <tr>
+                          <th>Product</th>
+                          <th>Category</th>
+                          <th class="text-center">Current Stock</th>
+                          <th class="text-center">Units Sold</th>
+                        </tr>
+                      </thead>
+                      <tbody id="rep-slowsellers-tbody"></tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ============================================================ -->
+        <!-- 8. SETTINGS VIEW -->
+        <!-- ============================================================ -->
+        <section id="view-settings" class="app-view d-none">
+          <div class="row g-4">
+            
+            <!-- Store Profile & Tax Settings -->
+            <div class="col-12 col-lg-7">
+              <div class="card border-0 shadow-sm rounded-3">
+                <div class="card-header bg-white border-bottom p-3">
+                  <h5 class="mb-0 fw-bold text-dark"><i class="bi bi-shop text-primary me-2"></i>Store & Business Profile</h5>
+                  <small class="text-muted">These details appear on your printed customer receipts and invoice headers.</small>
+                </div>
+                <div class="card-body p-4">
+                  <form id="settings-form">
+                    <div class="row g-3">
+                      <div class="col-12 col-md-6">
+                        <label for="set-shop-name" class="form-label small fw-bold">Shop / Business Name <span class="text-danger">*</span></label>
+                        <input type="text" id="set-shop-name" class="form-control" value="CartKaro Supermarket" required>
+                      </div>
+                      <div class="col-12 col-md-6">
+                        <label for="set-tagline" class="form-label small fw-bold">Store Tagline</label>
+                        <input type="text" id="set-tagline" class="form-control" value="Fresh Groceries & Daily Needs">
+                      </div>
+                      <div class="col-12">
+                        <label for="set-address" class="form-label small fw-bold">Shop Address</label>
+                        <input type="text" id="set-address" class="form-control" value="Shop 12-14, MG Road Market, Bengaluru, Karnataka 560001">
+                      </div>
+                      <div class="col-12 col-md-6">
+                        <label for="set-phone" class="form-label small fw-bold">Contact Phone Number</label>
+                        <input type="tel" id="set-phone" class="form-control" value="+91 98765 43210">
+                      </div>
+                      <div class="col-12 col-md-6">
+                        <label for="set-email" class="form-label small fw-bold">Email Address</label>
+                        <input type="email" id="set-email" class="form-control" value="support@cartkaro.local">
+                      </div>
+                      <div class="col-12 col-md-6">
+                        <label for="set-gstin" class="form-label small fw-bold">GSTIN / Tax Registration No.</label>
+                        <input type="text" id="set-gstin" class="form-control" value="29ABCDE1234F1Z5">
+                      </div>
+                      <div class="col-12 col-md-6">
+                        <label for="set-currency" class="form-label small fw-bold">Currency Symbol</label>
+                        <input type="text" id="set-currency" class="form-control" value="₹" readonly>
+                      </div>
+
+                      <hr class="my-2">
+                      <h6 class="fw-bold text-dark mb-0">POS & Receipt Defaults</h6>
+
+                      <div class="col-12 col-md-4">
+                        <label for="set-default-gst" class="form-label small fw-bold">Default GST Rate (%)</label>
+                        <select id="set-default-gst" class="form-select">
+                          <option value="0">0%</option>
+                          <option value="5" selected>5%</option>
+                          <option value="12">12%</option>
+                          <option value="18">18%</option>
+                          <option value="28">28%</option>
+                        </select>
+                      </div>
+                      <div class="col-12 col-md-4">
+                        <label for="set-default-discount" class="form-label small fw-bold">Default Discount (%)</label>
+                        <input type="number" id="set-default-discount" class="form-control" value="0" min="0" max="100">
+                      </div>
+                      <div class="col-12 col-md-4">
+                        <label for="set-min-stock" class="form-label small fw-bold">Low Stock Warning Threshold</label>
+                        <input type="number" id="set-min-stock" class="form-control" value="10" min="1">
+                      </div>
+                      <div class="col-12">
+                        <label for="set-receipt-footer" class="form-label small fw-bold">Receipt Footer Note</label>
+                        <textarea id="set-receipt-footer" class="form-control" rows="2">Thank you for shopping at CartKaro! Visit again.</textarea>
+                      </div>
+
+                      <div class="col-12 mt-3">
+                        <button type="submit" class="btn btn-primary px-4 fw-semibold">
+                          <i class="bi bi-check-lg me-1"></i> Save Store Settings
+                        </button>
+                      </div>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </div>
+
+            <!-- Data Management & Backup -->
+            <div class="col-12 col-lg-5">
+              <div class="card border-0 shadow-sm rounded-3 mb-4">
+                <div class="card-header bg-white border-bottom p-3">
+                  <h5 class="mb-0 fw-bold text-dark"><i class="bi bi-database text-primary me-2"></i>Data Backup & Portability</h5>
+                  <small class="text-muted">Export or import your entire local database (JSON format).</small>
+                </div>
+                <div class="card-body p-4">
+                  <p class="text-muted small">All your products, bills, settings, and stock history are stored safely in your browser's local storage.</p>
+                  
+                  <div class="d-grid gap-2">
+                    <!-- Export JSON -->
+                    <button class="btn btn-outline-primary d-flex align-items-center justify-content-center gap-2 py-2" id="export-backup-btn">
+                      <i class="bi bi-download"></i> Export Complete Data Backup (JSON)
+                    </button>
+
+                    <!-- Import JSON -->
+                    <label class="btn btn-outline-secondary d-flex align-items-center justify-content-center gap-2 py-2 mb-0">
+                      <i class="bi bi-upload"></i> Restore from Backup File (JSON)
+                      <input type="file" id="import-backup-file" accept=".json" class="d-none">
+                    </label>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Reset & Demo Data Controls -->
+              <div class="card border-0 shadow-sm rounded-3 border-danger-subtle">
+                <div class="card-header bg-white border-bottom p-3">
+                  <h6 class="mb-0 fw-bold text-danger"><i class="bi bi-exclamation-triangle-fill me-2"></i>Danger Zone & Demo Management</h6>
+                </div>
+                <div class="card-body p-4">
+                  <div class="mb-3">
+                    <label class="fw-semibold text-dark small d-block mb-1">Load Rich Demonstration Data</label>
+                    <p class="text-muted small mb-2">Populates 18 realistic supermarket items, categories, barcodes, stock levels, and past bills.</p>
+                    <button class="btn btn-outline-warning text-dark btn-sm w-100 fw-semibold" id="reload-demo-data-btn">
+                      <i class="bi bi-arrow-counterclockwise me-1"></i> Reload Sample Supermarket Data
+                    </button>
+                  </div>
+
+                  <hr>
+
+                  <div>
+                    <label class="fw-semibold text-danger small d-block mb-1">Factory Reset Application</label>
+                    <p class="text-muted small mb-2">Permanently deletes all products, sales history, and resets all settings to clean state.</p>
+                    <button class="btn btn-danger btn-sm w-100 fw-semibold" id="reset-all-data-btn">
+                      <i class="bi bi-trash3 me-1"></i> Wipe All Data
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </section>
+
+      </main>
+
+      <!-- App Status Footer -->
+      <footer class="app-footer bg-white border-top px-3 py-2 text-muted small d-flex flex-wrap align-items-center justify-content-between">
+        <div>
+          <strong>CartKaro</strong> Supermarket Management System &bull; Frontend Version 2.0
+        </div>
+        <div>
+          Storage: <span class="text-success fw-semibold"><i class="bi bi-hdd me-1"></i>Browser LocalStorage (Offline Ready)</span>
+        </div>
+      </footer>
+
+    </div>
+  </div>
+
+  <!-- ==================== MODALS ==================== -->
+
+  <!-- 1. ADD / EDIT PRODUCT MODAL -->
+  <div class="modal fade" id="product-modal" tabindex="-1" aria-labelledby="productModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+      <div class="modal-content border-0 shadow">
+        <div class="modal-header bg-primary text-white">
+          <h5 class="modal-title fw-bold" id="productModalLabel"><i class="bi bi-box-seam me-2"></i>Add New Product</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <form id="product-form" novalidate>
+          <div class="modal-body p-4">
+            <input type="hidden" id="prod-form-mode" value="add">
+            
+            <div class="row g-3">
+              <!-- Product ID -->
+              <div class="col-12 col-md-4">
+                <label for="prod-id" class="form-label small fw-bold">Product ID <span class="text-danger">*</span></label>
+                <div class="input-group input-group-sm">
+                  <input type="text" id="prod-id" class="form-control" placeholder="PRD-1001" required>
+                  <button type="button" class="btn btn-outline-secondary" id="btn-gen-prod-id" title="Auto Generate ID">
+                    <i class="bi bi-magic"></i>
+                  </button>
+                </div>
+                <div class="invalid-feedback">Unique Product ID is required.</div>
+              </div>
+
+              <!-- Barcode / SKU -->
+              <div class="col-12 col-md-4">
+                <label for="prod-barcode" class="form-label small fw-bold">Barcode / SKU <span class="text-danger">*</span></label>
+                <div class="input-group input-group-sm">
+                  <input type="text" id="prod-barcode" class="form-control" placeholder="8901030000001" required>
+                  <button type="button" class="btn btn-outline-secondary" id="btn-gen-barcode" title="Generate Barcode">
+                    <i class="bi bi-upc"></i>
+                  </button>
+                </div>
+                <div class="invalid-feedback">Unique Barcode is required.</div>
+              </div>
+
+              <!-- Category -->
+              <div class="col-12 col-md-4">
+                <label for="prod-category" class="form-label small fw-bold">Category <span class="text-danger">*</span></label>
+                <input type="text" id="prod-category" class="form-control form-control-sm" list="category-datalist" placeholder="Select or type..." required>
+                <datalist id="category-datalist">
+                  <option value="Groceries & Staples">
+                  <option value="Dairy & Bakery">
+                  <option value="Beverages">
+                  <option value="Snacks & Packaged Food">
+                  <option value="Personal Care & Hygiene">
+                  <option value="Household Essentials">
+                </datalist>
+                <div class="invalid-feedback">Category is required.</div>
+              </div>
+
+              <!-- Product Name -->
+              <div class="col-12">
+                <label for="prod-name" class="form-label small fw-bold">Product Name <span class="text-danger">*</span></label>
+                <input type="text" id="prod-name" class="form-control form-control-sm" placeholder="e.g. Aashirvaad Shudh Chakki Atta 5kg" required>
+                <div class="invalid-feedback">Product name is required.</div>
+              </div>
+
+              <!-- Purchase Cost Price -->
+              <div class="col-12 col-md-3">
+                <label for="prod-cost" class="form-label small fw-bold">Cost Price (₹) <span class="text-danger">*</span></label>
+                <input type="number" id="prod-cost" class="form-control form-control-sm" step="0.01" min="0" placeholder="0.00" required>
+                <div class="invalid-feedback">Valid cost price required.</div>
+              </div>
+
+              <!-- Selling Price -->
+              <div class="col-12 col-md-3">
+                <label for="prod-price" class="form-label small fw-bold">Selling Price (₹) <span class="text-danger">*</span></label>
+                <input type="number" id="prod-price" class="form-control form-control-sm" step="0.01" min="0" placeholder="0.00" required>
+                <div class="invalid-feedback">Selling price must be >= 0.</div>
+              </div>
+
+              <!-- Quantity -->
+              <div class="col-12 col-md-3">
+                <label for="prod-qty" class="form-label small fw-bold">Initial Stock <span class="text-danger">*</span></label>
+                <input type="number" id="prod-qty" class="form-control form-control-sm" min="0" placeholder="0" required>
+                <div class="invalid-feedback">Quantity cannot be negative.</div>
+              </div>
+
+              <!-- Minimum Stock Level -->
+              <div class="col-12 col-md-3">
+                <label for="prod-min-stock" class="form-label small fw-bold">Min Stock Alert Level</label>
+                <input type="number" id="prod-min-stock" class="form-control form-control-sm" min="1" value="10">
+              </div>
+
+              <!-- Supplier -->
+              <div class="col-12 col-md-6">
+                <label for="prod-supplier" class="form-label small fw-bold">Supplier / Distributor</label>
+                <input type="text" id="prod-supplier" class="form-control form-control-sm" placeholder="e.g. Metro Wholesale / ITC Ltd">
+              </div>
+
+              <!-- Expiry Date -->
+              <div class="col-12 col-md-6">
+                <label for="prod-expiry" class="form-label small fw-bold">Expiry Date</label>
+                <input type="date" id="prod-expiry" class="form-control form-control-sm">
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer bg-light">
+            <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancel</button>
+            <button type="submit" class="btn btn-primary btn-sm px-4 fw-semibold" id="btn-save-product">
+              Save Product
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. STOCK ADJUSTMENT / RESTOCK MODAL -->
+  <div class="modal fade" id="stock-modal" tabindex="-1" aria-labelledby="stockModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content border-0 shadow">
+        <div class="modal-header bg-dark text-white">
+          <h5 class="modal-title fw-bold" id="stockModalLabel"><i class="bi bi-arrow-left-right me-2"></i>Stock In / Out Adjustment</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <form id="stock-form">
+          <div class="modal-body p-4">
+            <div class="mb-3">
+              <label for="stock-product-select" class="form-label small fw-bold">Select Product <span class="text-danger">*</span></label>
+              <select id="stock-product-select" class="form-select form-select-sm" required>
+                <!-- Populated dynamically -->
+              </select>
+            </div>
+
+            <div class="p-2 bg-light rounded-3 border mb-3 small d-flex justify-content-between align-items-center">
+              <span>Current In-Stock Quantity:</span>
+              <strong class="fs-6 text-primary" id="stock-current-display">0 Units</strong>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label small fw-bold">Operation Type <span class="text-danger">*</span></label>
+              <div class="btn-group w-100" role="group">
+                <input type="radio" class="btn-check" name="stockOpType" id="stock-op-in" value="IN" checked>
+                <label class="btn btn-outline-success btn-sm fw-semibold" for="stock-op-in"><i class="bi bi-box-arrow-in-down me-1"></i> Stock In (+)</label>
+
+                <input type="radio" class="btn-check" name="stockOpType" id="stock-op-out" value="OUT">
+                <label class="btn btn-outline-warning text-dark btn-sm fw-semibold" for="stock-op-out"><i class="bi bi-box-arrow-up me-1"></i> Stock Out (-)</label>
+
+                <input type="radio" class="btn-check" name="stockOpType" id="stock-op-set" value="ADJUST">
+                <label class="btn btn-outline-primary btn-sm fw-semibold" for="stock-op-set"><i class="bi bi-sliders me-1"></i> Direct Count (=)</label>
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label for="stock-qty-input" class="form-label small fw-bold" id="stock-qty-label">Quantity to Add <span class="text-danger">*</span></label>
+              <input type="number" id="stock-qty-input" class="form-control form-control-sm" min="1" value="10" required>
+            </div>
+
+            <div class="mb-3">
+              <label for="stock-reason-select" class="form-label small fw-bold">Reason / Note <span class="text-danger">*</span></label>
+              <select id="stock-reason-select" class="form-select form-select-sm mb-2">
+                <option value="New Stock Arrival / Purchase">New Stock Arrival / Purchase</option>
+                <option value="Customer Return">Customer Return</option>
+                <option value="Damaged / Broken Item">Damaged / Broken Item</option>
+                <option value="Expired Product">Expired Product</option>
+                <option value="Physical Inventory Audit Count">Physical Inventory Audit Count</option>
+                <option value="Internal Store Consumption">Internal Store Consumption</option>
+                <option value="Other">Other (Custom note below)</option>
+              </select>
+              <input type="text" id="stock-custom-note" class="form-control form-control-sm" placeholder="Additional reference or note...">
+            </div>
+
+            <div class="p-2 bg-primary-subtle border border-primary-subtle rounded-3 small d-flex justify-content-between align-items-center">
+              <span>Projected New Stock:</span>
+              <strong class="fs-6 text-primary" id="stock-projected-display">--</strong>
+            </div>
+          </div>
+          <div class="modal-footer bg-light">
+            <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancel</button>
+            <button type="submit" class="btn btn-primary btn-sm px-4 fw-semibold">Save Adjustment</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. PROFESSIONAL THERMAL RECEIPT MODAL -->
+  <div class="modal fade" id="receipt-modal" tabindex="-1" aria-labelledby="receiptModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" style="max-width: 420px;">
+      <div class="modal-content border-0 shadow">
+        <div class="modal-header py-2 px-3 bg-light border-bottom no-print">
+          <h6 class="modal-title fw-bold mb-0 text-dark"><i class="bi bi-receipt me-1 text-primary"></i> Tax Invoice & Receipt</h6>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        
+        <!-- PRINTABLE RECEIPT CONTENT CONTAINER -->
+        <div class="modal-body p-4 bg-white" id="printable-receipt">
+          <div class="receipt-header text-center pb-2 border-bottom border-dark border-1">
+            <h5 class="fw-bold mb-0 text-uppercase" id="rcpt-shop-name">CartKaro Supermarket</h5>
+            <small class="d-block text-muted" id="rcpt-tagline">Fresh Groceries & Daily Needs</small>
+            <small class="d-block text-muted" id="rcpt-address">Shop 12-14, MG Road, Bengaluru</small>
+            <small class="d-block text-muted">Phone: <span id="rcpt-phone">+91 98765 43210</span></small>
+            <small class="d-block fw-bold mt-1">GSTIN: <span id="rcpt-gstin">29ABCDE1234F1Z5</span></small>
+          </div>
+
+          <div class="receipt-meta py-2 border-bottom border-dark border-dashed small">
+            <div class="d-flex justify-content-between">
+              <span>Bill No: <strong id="rcpt-bill-no">#BILL-1001</strong></span>
+              <span id="rcpt-date-time">26/10/2026 19:15</span>
+            </div>
+            <div class="d-flex justify-content-between mt-1">
+              <span>Customer: <span id="rcpt-customer-name">Walk-in</span></span>
+              <span id="rcpt-customer-phone"></span>
+            </div>
+            <div class="d-flex justify-content-between mt-1 text-muted">
+              <span>Cashier: Admin</span>
+              <span class="badge bg-light text-dark border py-0" id="rcpt-payment-mode">Cash</span>
+            </div>
+          </div>
+
+          <table class="table table-borderless table-sm my-2 receipt-items-table small">
+            <thead>
+              <tr class="border-bottom border-dark">
+                <th class="ps-0">Item</th>
+                <th class="text-center">Qty</th>
+                <th class="text-end">Rate</th>
+                <th class="text-end pe-0">Amt</th>
+              </tr>
+            </thead>
+            <tbody id="rcpt-items-tbody">
+              <!-- Populated dynamically -->
+            </tbody>
+          </table>
+
+          <div class="receipt-totals border-top border-dark border-dashed pt-2 small">
+            <div class="d-flex justify-content-between">
+              <span>Subtotal:</span>
+              <span id="rcpt-subtotal">₹0.00</span>
+            </div>
+            <div class="d-flex justify-content-between text-muted" id="rcpt-discount-row">
+              <span>Discount:</span>
+              <span id="rcpt-discount">-₹0.00</span>
+            </div>
+            <div class="d-flex justify-content-between text-muted">
+              <span>GST (<span id="rcpt-gst-rate">5%</span>):</span>
+              <span id="rcpt-gst">₹0.00</span>
+            </div>
+            <div class="d-flex justify-content-between fs-6 fw-bold border-top border-bottom border-dark py-1 my-1">
+              <span>Grand Total:</span>
+              <span id="rcpt-grand-total">₹0.00</span>
+            </div>
+            <div class="d-flex justify-content-between text-muted" id="rcpt-tendered-row">
+              <span>Cash Tendered:</span>
+              <span id="rcpt-tendered">₹0.00</span>
+            </div>
+            <div class="d-flex justify-content-between text-muted" id="rcpt-change-row">
+              <span>Change Returned:</span>
+              <span id="rcpt-change">₹0.00</span>
+            </div>
+          </div>
+
+          <div class="receipt-footer text-center mt-3 pt-2 border-top border-dark border-1 small">
+            <p class="mb-1 fw-semibold" id="rcpt-footer-msg">Thank you for shopping at CartKaro!</p>
+            <div class="barcode-container my-1">
+              <i class="bi bi-upc display-6 text-dark opacity-75"></i>
+            </div>
+            <small class="text-muted d-block font-monospace">Software: CartKaro POS</small>
+          </div>
+        </div>
+
+        <div class="modal-footer bg-light p-2 d-flex justify-content-between no-print">
+          <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Close</button>
+          <div class="d-flex gap-2">
+            <button type="button" class="btn btn-outline-primary btn-sm" id="btn-new-bill-from-rcpt">
+              <i class="bi bi-plus-lg me-1"></i> New Bill
+            </button>
+            <button type="button" class="btn btn-primary btn-sm px-3 fw-semibold" id="btn-print-receipt">
+              <i class="bi bi-printer me-1"></i> Print Receipt
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4. DELETE / ACTION CONFIRMATION MODAL -->
+  <div class="modal fade" id="confirm-modal" tabindex="-1" aria-labelledby="confirmModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-sm">
+      <div class="modal-content border-0 shadow">
+        <div class="modal-body p-4 text-center">
+          <div class="display-5 text-danger mb-3" id="confirm-icon"><i class="bi bi-exclamation-triangle"></i></div>
+          <h5 class="fw-bold text-dark" id="confirm-title">Are you sure?</h5>
+          <p class="text-muted small mb-4" id="confirm-message">This action cannot be undone.</p>
+          <div class="d-flex gap-2 justify-content-center">
+            <button type="button" class="btn btn-light btn-sm px-3" data-bs-dismiss="modal">Cancel</button>
+            <button type="button" class="btn btn-danger btn-sm px-3 fw-semibold" id="confirm-action-btn">Confirm</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 5. SUPABASE CONNECTION & STAFF LOGIN MODAL -->
+  <div class="modal fade" id="supabase-auth-modal" tabindex="-1" aria-labelledby="supabaseAuthModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content border-0 shadow">
+        <div class="modal-header bg-dark text-white p-3">
+          <h6 class="modal-title fw-bold" id="supabaseAuthModalLabel">
+            <i class="bi bi-database me-2 text-primary"></i> Supabase Database & Staff Access
+          </h6>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body p-4">
+          <!-- Connection Status Card -->
+          <div class="p-3 bg-light rounded-3 border mb-3">
+            <div class="d-flex align-items-center justify-content-between mb-1">
+              <span class="small text-muted fw-bold text-uppercase">Supabase Endpoint:</span>
+              <span class="badge bg-success-subtle text-success border border-success-subtle" id="modal-sb-ping-badge">Connected</span>
+            </div>
+            <code class="d-block small text-break text-dark bg-white p-2 border rounded" id="modal-sb-url">https://ywobsbogfesnvsgqbhej.supabase.co</code>
+            <div class="mt-2 small text-muted d-flex justify-content-between align-items-center">
+              <span>Auth Role: <strong id="modal-sb-session-status" class="text-secondary">Unauthenticated (Guest)</strong></span>
+              <button class="btn btn-link btn-sm p-0 text-decoration-none" id="btn-test-sb-connection"><i class="bi bi-arrow-clockwise me-1"></i>Test Live Query</button>
+            </div>
+          </div>
+
+          <!-- RLS Notice -->
+          <div class="alert alert-warning p-2 small mb-3">
+            <i class="bi bi-shield-lock me-1 fw-bold"></i>
+            <strong>Row Level Security (RLS) is Active:</strong> In this schema, all tables require an <code>authenticated</code> staff login. As an unauthenticated guest, live queries return 0 rows.
+          </div>
+
+          <!-- Staff Login Form -->
+          <form id="supabase-login-form">
+            <h6 class="fw-bold text-dark mb-2 small text-uppercase">Staff Sign In (Supabase Auth)</h6>
+            <div class="mb-2">
+              <label for="sb-login-email" class="form-label small mb-1">Staff Email</label>
+              <input type="email" id="sb-login-email" class="form-control form-control-sm" placeholder="staff@example.com" autocomplete="username">
+            </div>
+            <div class="mb-3">
+              <label for="sb-login-password" class="form-label small mb-1">Password</label>
+              <input type="password" id="sb-login-password" class="form-control form-control-sm" placeholder="••••••••" autocomplete="current-password">
+            </div>
+            <div class="d-flex gap-2">
+              <button type="submit" class="btn btn-primary btn-sm flex-grow-1 fw-semibold" id="btn-sb-login">
+                <i class="bi bi-box-arrow-in-right me-1"></i> Sign In as Staff
+              </button>
+              <button type="button" class="btn btn-outline-danger btn-sm d-none" id="btn-sb-logout">
+                <i class="bi bi-box-arrow-right me-1"></i> Logout
+              </button>
+            </div>
+          </form>
+
+          <!-- Test Output Log Box -->
+          <div id="sb-query-test-output" class="mt-3 p-2 bg-dark text-light font-monospace small rounded d-none" style="max-height: 140px; overflow-y: auto; font-size: 0.75rem;"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 1090;">
+    <div id="live-toast" class="toast align-items-center text-white bg-dark border-0 shadow" role="alert" aria-live="assertive" aria-atomic="true">
+      <div class="d-flex">
+        <div class="toast-body d-flex align-items-center gap-2" id="toast-message">
+          <i class="bi bi-info-circle fs-5"></i> Action completed successfully.
+        </div>
+        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== SCRIPTS ==================== -->
+  <!-- Bootstrap 5.3.3 JS Bundle -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  
+  <!-- Chart.js 4.4.2 -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
+
+  <!-- Supabase JS Client v2 -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <!-- Core Application Logic -->
+  <script src="app.js"></script>
+</body>
+</html>
