@@ -1,333 +1,433 @@
 /* ==========================================================================
-   CartKaro - Dark Mode Theme
-   Loaded after style.css. Everything below is scoped to
-   <html data-bs-theme="dark">, so Light Mode is completely unaffected.
-   Bootstrap 5.3 already restyles its own components for data-bs-theme="dark";
-   this file sets the CartKaro palette and fixes the parts Bootstrap leaves light.
+   CartKaro - Supermarket Inventory & Billing System
+   Theme: Professional Commercial Blue-and-White Theme
    ========================================================================== */
 
-/* ---------- Smooth theme transition (class is added for ~0.5s while toggling) ---------- */
-html.theme-transition,
-html.theme-transition *,
-html.theme-transition *::before,
-html.theme-transition *::after {
-  transition: background-color 0.35s ease, color 0.35s ease, border-color 0.35s ease,
-              box-shadow 0.35s ease, fill 0.35s ease, stroke 0.35s ease !important;
+:root {
+  --bs-primary: #1e40af;
+  --bs-primary-rgb: 30, 64, 175;
+  --primary-hover: #1d4ed8;
+  --primary-light: #eff6ff;
+  --primary-border: #bfdbfe;
+
+  --secondary-bg: #f8fafc;
+  --card-bg: #ffffff;
+  --border-color: #e2e8f0;
+  --text-dark: #0f172a;
+  --text-muted: #64748b;
+
+  --sidebar-width: 280px;
+  --sidebar-collapsed-width: 78px;
+  --topbar-height: 64px;
+
+  --purple: #7c3aed;
+  --purple-subtle: #f3e8ff;
+  --indigo: #4f46e5;
+  --indigo-subtle: #e0e7ff;
 }
 
-/* ---------- Palette (CartKaro variables + Bootstrap variables) ---------- */
-[data-bs-theme="dark"] {
-  --secondary-bg: #0b1220;
-  --card-bg: #111a2e;
-  --border-color: #25324a;
-  --text-dark: #e2e8f0;
-  --text-muted: #94a3b8;
-  --primary-light: #172554;
-  --primary-border: #1e3a8a;
-  --purple-subtle: #2e1065;
-  --indigo-subtle: #1e1b4b;
-
-  --bs-body-bg: #0b1220;
-  --bs-body-bg-rgb: 11, 18, 32;
-  --bs-body-color: #e2e8f0;
-  --bs-body-color-rgb: 226, 232, 240;
-  --bs-secondary-color: rgba(203, 213, 225, 0.75);
-  --bs-secondary-bg: #162033;
-  --bs-tertiary-bg: #111a2e;
-  --bs-border-color: #25324a;
-  --bs-emphasis-color: #f8fafc;
-  --bs-link-color: #60a5fa;
-  --bs-link-hover-color: #93c5fd;
-  --bs-link-color-rgb: 96, 165, 250;
-  --bs-link-hover-color-rgb: 147, 197, 253;
+/* Base resets & typography */
+* {
+  box-sizing: border-box;
 }
 
-[data-bs-theme="dark"] body {
-  background-color: #0b1220;
-  color: #e2e8f0;
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  color: var(--text-dark);
+  background-color: var(--secondary-bg);
+  min-height: 100vh;
+  margin: 0;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
 }
 
-[data-bs-theme="dark"] .main-content-wrapper {
-  background-color: #0b1220;
+h1, h2, h3, h4, h5, h6, .brand-title {
+  font-family: 'Outfit', 'Inter', sans-serif;
 }
 
-/* ---------- Scrollbars ---------- */
-[data-bs-theme="dark"] ::-webkit-scrollbar-track { background: #0f172a; }
-[data-bs-theme="dark"] ::-webkit-scrollbar-thumb { background: #334155; }
-[data-bs-theme="dark"] ::-webkit-scrollbar-thumb:hover { background: #475569; }
-
-/* ---------- Utility classes used all over the app ---------- */
-[data-bs-theme="dark"] .bg-white { background-color: #111a2e !important; }
-[data-bs-theme="dark"] .bg-light { background-color: #162033 !important; }
-[data-bs-theme="dark"] .bg-light-subtle { background-color: #0f172a !important; }
-
-[data-bs-theme="dark"] .text-dark { color: #e2e8f0 !important; }
-[data-bs-theme="dark"] .text-secondary { color: #9ca3af !important; }
-[data-bs-theme="dark"] .text-primary { color: #60a5fa !important; }
-[data-bs-theme="dark"] .text-success { color: #4ade80 !important; }
-[data-bs-theme="dark"] .text-danger { color: #f87171 !important; }
-[data-bs-theme="dark"] .text-purple { color: #c4b5fd !important; }
-[data-bs-theme="dark"] .text-indigo { color: #a5b4fc !important; }
-
-[data-bs-theme="dark"] .bg-purple-subtle { background-color: #2e1065 !important; }
-[data-bs-theme="dark"] .bg-indigo-subtle { background-color: #1e1b4b !important; }
-
-/* Yellow "warning" badges / buttons keep dark text so they stay readable */
-[data-bs-theme="dark"] .bg-warning.text-dark,
-[data-bs-theme="dark"] .btn-warning.text-dark,
-[data-bs-theme="dark"] .badge.bg-warning { color: #1f2937 !important; }
-[data-bs-theme="dark"] .btn-outline-warning.text-dark:hover { color: #1f2937 !important; }
-
-/* Text that sits on a white pill/badge in a blue header stays blue */
-[data-bs-theme="dark"] .badge.bg-white.text-primary { color: #93c5fd !important; }
-
-/* ---------- Layout: top navbar, sidebar, footer ---------- */
-[data-bs-theme="dark"] .top-navbar,
-[data-bs-theme="dark"] .app-footer {
-  background-color: #111a2e !important;
-  border-color: #25324a !important;
+/* Custom scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #f1f5f9;
+}
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
 }
 
-[data-bs-theme="dark"] .sidebar {
-  background-color: #0f172a !important;
-  border-color: #25324a !important;
-  box-shadow: 2px 0 8px rgba(0, 0, 0, 0.35);
+/* ==================== BOOTSTRAP COLOUR TWEAKS ==================== */
+/* Main action buttons use the CartKaro navy blue */
+.btn-primary {
+  --bs-btn-bg: #1e40af;
+  --bs-btn-border-color: #1e40af;
+  --bs-btn-hover-bg: #1d4ed8;
+  --bs-btn-hover-border-color: #1d4ed8;
+  --bs-btn-active-bg: #1e3a8a;
+  --bs-btn-active-border-color: #1e3a8a;
+  --bs-btn-disabled-bg: #1e40af;
+  --bs-btn-disabled-border-color: #1e40af;
+  --bs-btn-focus-shadow-rgb: 30, 64, 175;
 }
 
-[data-bs-theme="dark"] .sidebar .nav-link { color: #94a3b8; }
-[data-bs-theme="dark"] .sidebar .nav-link:hover:not(.active) {
-  background-color: rgba(148, 163, 184, 0.12);
-  color: #e2e8f0 !important;
+.btn-white {
+  background-color: #ffffff;
+  color: #334155;
 }
-[data-bs-theme="dark"] .sidebar .nav-link.active {
-  background-color: rgba(59, 130, 246, 0.2) !important;
-  color: #93c5fd !important;
-}
-
-[data-bs-theme="dark"] .sidebar-footer { background-color: #0b1220 !important; }
-
-/* ---------- Cards ---------- */
-[data-bs-theme="dark"] .card {
-  --bs-card-bg: #111a2e;
-  --bs-card-cap-bg: #111a2e;
-  --bs-card-border-color: #25324a;
-  --bs-card-color: #e2e8f0;
-}
-[data-bs-theme="dark"] .stat-card,
-[data-bs-theme="dark"] .pos-product-card {
-  background-color: #111a2e;
-  border-color: #25324a;
-}
-[data-bs-theme="dark"] .pos-product-card:hover {
-  background-color: #162033;
-  border-color: #3b82f6;
-}
-[data-bs-theme="dark"] .pos-product-icon-wrap {
-  background-color: #172554;
-  color: #93c5fd;
+.btn-white:hover {
+  background-color: #f1f5f9;
+  color: #0f172a;
 }
 
-/* ---------- Tables ---------- */
-[data-bs-theme="dark"] .table {
-  --bs-table-color: #e2e8f0;
-  --bs-table-bg: transparent;
-  --bs-table-border-color: #25324a;
-  --bs-table-hover-bg: rgba(148, 163, 184, 0.08);
-  --bs-table-hover-color: #f8fafc;
-  --bs-table-striped-bg: rgba(148, 163, 184, 0.05);
-  color: #e2e8f0;
-}
-/* Bootstrap's .table-light is a fixed light colour, so restyle it */
-[data-bs-theme="dark"] .table-light {
-  --bs-table-color: #cbd5e1;
-  --bs-table-bg: #162033;
-  --bs-table-border-color: #25324a;
-  --bs-table-hover-bg: #1b2740;
-  --bs-table-hover-color: #f8fafc;
-  color: #cbd5e1;
+.btn-primary-subtle {
+  background-color: var(--primary-light);
+  color: var(--bs-primary);
 }
 
-/* ---------- Forms ---------- */
-[data-bs-theme="dark"] .form-control,
-[data-bs-theme="dark"] .form-select {
-  background-color: #0f172a;
-  border-color: #2d3b57;
-  color: #e2e8f0;
-}
-[data-bs-theme="dark"] .form-control::placeholder { color: #64748b; }
-[data-bs-theme="dark"] .form-control:focus,
-[data-bs-theme="dark"] .form-select:focus {
-  background-color: #0f172a;
-  border-color: #3b82f6;
-  color: #f8fafc;
-  box-shadow: 0 0 0 0.2rem rgba(59, 130, 246, 0.25);
-}
-[data-bs-theme="dark"] .form-control:disabled,
-[data-bs-theme="dark"] .form-control[readonly] {
-  background-color: #162033;
-  color: #94a3b8;
-}
-[data-bs-theme="dark"] .form-control.bg-light,
-[data-bs-theme="dark"] .input-group-text.bg-light,
-[data-bs-theme="dark"] .input-group-text {
-  background-color: #162033 !important;
-  border-color: #2d3b57;
-  color: #94a3b8;
-}
-[data-bs-theme="dark"] .form-label { color: #cbd5e1; }
+/* Custom subtle colour helpers used by the dashboard cards and badges */
+.bg-purple-subtle { background-color: var(--purple-subtle) !important; }
+.text-purple { color: var(--purple) !important; }
+.bg-indigo-subtle { background-color: var(--indigo-subtle) !important; }
+.text-indigo { color: var(--indigo) !important; }
 
-/* ---------- Buttons ---------- */
-[data-bs-theme="dark"] .btn-light {
-  --bs-btn-color: #e2e8f0;
-  --bs-btn-bg: #1b2740;
-  --bs-btn-border-color: #2d3b57;
-  --bs-btn-hover-color: #ffffff;
-  --bs-btn-hover-bg: #25324a;
-  --bs-btn-hover-border-color: #3b4a68;
-  --bs-btn-active-color: #ffffff;
-  --bs-btn-active-bg: #2d3b57;
-  --bs-btn-active-border-color: #3b4a68;
-}
-[data-bs-theme="dark"] .btn-white {
-  background-color: #1b2740;
-  border-color: #2d3b57 !important;
-  color: #e2e8f0;
-}
-[data-bs-theme="dark"] .btn-white:hover {
-  background-color: #25324a;
-  color: #ffffff;
-}
-[data-bs-theme="dark"] .btn-outline-secondary {
-  --bs-btn-color: #9fb0c8;
-  --bs-btn-border-color: #475569;
-  --bs-btn-hover-color: #ffffff;
-  --bs-btn-hover-bg: #334155;
-  --bs-btn-hover-border-color: #475569;
-  --bs-btn-active-color: #ffffff;
-  --bs-btn-active-bg: #334155;
-  --bs-btn-active-border-color: #475569;
-}
-[data-bs-theme="dark"] .btn-outline-primary {
-  --bs-btn-color: #60a5fa;
-  --bs-btn-border-color: #3b82f6;
-  --bs-btn-hover-color: #ffffff;
-  --bs-btn-hover-bg: #1e40af;
-  --bs-btn-hover-border-color: #1e40af;
-  --bs-btn-active-color: #ffffff;
-  --bs-btn-active-bg: #1e40af;
-  --bs-btn-active-border-color: #1e40af;
-}
-[data-bs-theme="dark"] .btn-primary-subtle {
-  background-color: #172554;
-  border-color: #1e3a8a !important;
-  color: #93c5fd;
-}
-[data-bs-theme="dark"] .btn-link { color: #60a5fa; }
+.max-w-md { max-width: 480px; }
+.border-dashed { border-style: dashed !important; }
 
-/* ---------- Dropdowns, notifications, global search ---------- */
-[data-bs-theme="dark"] .dropdown-menu {
-  --bs-dropdown-bg: #111a2e;
-  --bs-dropdown-color: #e2e8f0;
-  --bs-dropdown-border-color: #25324a;
-  --bs-dropdown-link-color: #e2e8f0;
-  --bs-dropdown-link-hover-color: #ffffff;
-  --bs-dropdown-link-hover-bg: #1b2740;
-  --bs-dropdown-header-color: #94a3b8;
-  --bs-dropdown-divider-bg: #25324a;
-  background-color: #111a2e;
-  color: #e2e8f0;
-}
-[data-bs-theme="dark"] .dropdown-item:hover,
-[data-bs-theme="dark"] .dropdown-item:focus { background-color: #1b2740; }
-[data-bs-theme="dark"] .list-group-item {
-  --bs-list-group-bg: #111a2e;
-  --bs-list-group-color: #e2e8f0;
-  --bs-list-group-border-color: #25324a;
-  --bs-list-group-action-hover-bg: #1b2740;
-  --bs-list-group-action-hover-color: #ffffff;
+/* ==================== LAYOUT & WRAPPER ==================== */
+.app-wrapper {
+  min-height: 100vh;
+  width: 100vw;
+  overflow: hidden;
 }
 
-/* ---------- Modals ---------- */
-[data-bs-theme="dark"] .modal {
-  --bs-modal-bg: #111a2e;
-  --bs-modal-color: #e2e8f0;
-  --bs-modal-border-color: #25324a;
-  --bs-modal-header-border-color: #25324a;
-  --bs-modal-footer-border-color: #25324a;
-}
-[data-bs-theme="dark"] .modal-backdrop { --bs-backdrop-opacity: 0.7; }
-
-/* ---------- Tabs & pagination ---------- */
-[data-bs-theme="dark"] .nav-tabs {
-  --bs-nav-tabs-border-color: #25324a;
-  --bs-nav-tabs-link-hover-border-color: #25324a #25324a #25324a;
-  --bs-nav-tabs-link-active-bg: #111a2e;
-  --bs-nav-tabs-link-active-color: #f8fafc;
-  --bs-nav-tabs-link-active-border-color: #25324a #25324a #111a2e;
-}
-[data-bs-theme="dark"] .nav-tabs .nav-link { color: #94a3b8; }
-[data-bs-theme="dark"] .nav-tabs .nav-link:hover { color: #e2e8f0; }
-[data-bs-theme="dark"] .nav-tabs .nav-link.active { color: #f8fafc; }
-
-[data-bs-theme="dark"] .pagination {
-  --bs-pagination-bg: #111a2e;
-  --bs-pagination-color: #94a3b8;
-  --bs-pagination-border-color: #25324a;
-  --bs-pagination-hover-bg: #1b2740;
-  --bs-pagination-hover-color: #ffffff;
-  --bs-pagination-hover-border-color: #2d3b57;
-  --bs-pagination-focus-bg: #1b2740;
-  --bs-pagination-active-bg: #1e40af;
-  --bs-pagination-active-border-color: #1e40af;
-  --bs-pagination-active-color: #ffffff;
-  --bs-pagination-disabled-bg: #0f172a;
-  --bs-pagination-disabled-color: #475569;
-  --bs-pagination-disabled-border-color: #25324a;
+.main-content-wrapper {
+  height: 100vh;
+  min-width: 0;
+  background-color: #f8fafc;
 }
 
-/* ---------- Scanner screen ---------- */
-[data-bs-theme="dark"] .scanner-box {
-  background-color: #0f172a !important;
-  border-color: #25324a !important;
+.top-navbar {
+  min-height: var(--topbar-height);
+  z-index: 1030;
 }
 
-/* ---------- Things that must stay light ---------- */
-/* UPI QR code needs a white background to stay scannable */
-[data-bs-theme="dark"] .upi-qr-box { background-color: #ffffff !important; }
-
-/* The printed receipt is "paper": keep it white with dark text in both themes */
-[data-bs-theme="dark"] #printable-receipt {
-  background-color: #ffffff !important;
-  color: #212529 !important;
-}
-[data-bs-theme="dark"] #printable-receipt .table {
-  --bs-table-color: #212529;
-  --bs-table-bg: transparent;
-  --bs-table-border-color: #dee2e6;
-  color: #212529;
-}
-[data-bs-theme="dark"] #printable-receipt .text-muted,
-[data-bs-theme="dark"] #printable-receipt .text-dark { color: #6c757d !important; }
-[data-bs-theme="dark"] #printable-receipt .fw-bold,
-[data-bs-theme="dark"] #printable-receipt h5,
-[data-bs-theme="dark"] #printable-receipt i { color: #212529 !important; }
-[data-bs-theme="dark"] #printable-receipt .border-dark { border-color: #212529 !important; }
-[data-bs-theme="dark"] #printable-receipt .badge.bg-light {
-  background-color: #f8f9fa !important;
-  color: #212529 !important;
-  border-color: #dee2e6 !important;
+/* ==================== SIDEBAR STYLING ==================== */
+.sidebar {
+  width: var(--sidebar-width);
+  min-width: var(--sidebar-width);
+  flex-shrink: 0;
+  height: 100vh;
+  z-index: 1040;
+  overflow: hidden;
+  transition: width 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+              min-width 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+              transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 2px 0 8px rgba(0, 0, 0, 0.03);
 }
 
-/* ---------- Printing: never print light text on white paper ---------- */
-@media print {
-  [data-bs-theme="dark"] body,
-  [data-bs-theme="dark"] .main-content-wrapper {
-    background-color: #ffffff !important;
+/* Branding block: compact 50px logo beside the name */
+.sidebar-header {
+  min-height: 78px;
+}
+
+.brand-logo-container {
+  flex-shrink: 0;
+  width: 50px;
+  height: 50px;
+}
+
+.brand-logo {
+  display: block;
+  width: 50px;
+  height: 50px;
+  max-width: 50px;
+  object-fit: contain;
+  border-radius: 10px;
+}
+
+.brand-icon-box {
+  width: 50px;
+  height: 50px;
+}
+.brand-icon-box:not(.d-none) {
+  display: flex;
+}
+
+.brand-text {
+  min-width: 0;
+  line-height: 1.15;
+}
+
+.brand-title {
+  font-size: 1.15rem;
+  line-height: 1.15;
+  white-space: nowrap;
+}
+
+.brand-subtitle {
+  font-size: 0.7rem;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+
+/* Menu items: same height, padding and icon column for every entry */
+.sidebar-nav {
+  scrollbar-width: thin;
+}
+
+.sidebar .nav-link {
+  color: #64748b;
+  font-weight: 500;
+  font-size: 0.95rem;
+  border: 1px solid transparent;
+  white-space: nowrap;
+  transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+
+.sidebar .nav-link i {
+  width: 1.5rem;
+  flex-shrink: 0;
+  text-align: center;
+  line-height: 1;
+}
+
+.sidebar .nav-link:hover:not(.active) {
+  background-color: #f1f5f9;
+  color: var(--text-dark);
+}
+
+.sidebar .nav-pills .nav-link.active,
+.sidebar .nav-link.active {
+  background-color: var(--primary-light);
+  border-color: var(--primary-border);
+  color: var(--bs-primary);
+  font-weight: 600;
+}
+
+/* New Bill (POS) button fits the sidebar width */
+.sidebar .nav-link-btn {
+  white-space: nowrap;
+}
+
+.sidebar-footer .avatar {
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+  font-size: 0.85rem;
+}
+
+.sidebar-footer .user-details {
+  min-width: 0;
+}
+
+/* Backdrop behind the slide-in sidebar on small screens */
+.sidebar-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.5);
+  z-index: 1035;
+}
+
+/* ---------- Desktop: collapsed sidebar (icons only) ---------- */
+@media (min-width: 992px) {
+  body.sidebar-collapsed .sidebar {
+    width: var(--sidebar-collapsed-width);
+    min-width: var(--sidebar-collapsed-width);
   }
-  [data-bs-theme="dark"] body *:not(#printable-receipt *) {
-    color: #000000 !important;
-    background-color: transparent !important;
-    border-color: #cccccc !important;
+
+  body.sidebar-collapsed .sidebar .brand-text,
+  body.sidebar-collapsed .sidebar .sidebar-label,
+  body.sidebar-collapsed .sidebar .user-details,
+  body.sidebar-collapsed .sidebar #low-stock-sidebar-badge {
+    display: none !important;
+  }
+
+  body.sidebar-collapsed .sidebar .sidebar-header {
+    justify-content: center !important;
+    padding-left: 0.5rem !important;
+    padding-right: 0.5rem !important;
+  }
+
+  body.sidebar-collapsed .sidebar .brand-logo-container {
+    margin-right: 0 !important;
+  }
+
+  body.sidebar-collapsed .sidebar .nav-link,
+  body.sidebar-collapsed .sidebar .nav-link-btn {
+    justify-content: center !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+  }
+
+  body.sidebar-collapsed .sidebar .nav-link > div {
+    justify-content: center;
+  }
+
+  body.sidebar-collapsed .sidebar .sidebar-footer .d-flex {
+    justify-content: center;
+  }
+}
+
+/* ---------- Tablet / phone: sidebar slides over the page ---------- */
+@media (max-width: 991.98px) {
+  .sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    transform: translateX(-100%);
+    box-shadow: none;
+  }
+
+  body.sidebar-mobile-open .sidebar {
+    transform: translateX(0);
+    box-shadow: 4px 0 24px rgba(15, 23, 42, 0.25);
+  }
+
+  .app-wrapper .main-content-wrapper {
+    width: 100%;
+  }
+}
+
+/* ==================== DASHBOARD CARDS ==================== */
+.stat-card {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.08) !important;
+}
+
+.stat-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+}
+
+/* ==================== POS SCREEN ==================== */
+.pos-product-card {
+  cursor: pointer;
+  border: 1px solid var(--border-color);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
+}
+
+.pos-product-card:hover {
+  border-color: var(--bs-primary);
+  box-shadow: 0 6px 16px rgba(30, 64, 175, 0.12);
+  transform: translateY(-2px);
+}
+
+.pos-product-card.out-of-stock {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.pos-product-card.out-of-stock:hover {
+  border-color: var(--border-color);
+  box-shadow: none;
+  transform: none;
+}
+
+.pos-product-icon-wrap {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background-color: var(--primary-light);
+  color: var(--bs-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+}
+
+.cart-qty-btn {
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cart-qty-input::-webkit-outer-spin-button,
+.cart-qty-input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+.cart-qty-input {
+  -moz-appearance: textfield;
+}
+
+/* ==================== BARCODE SCANNER SCREEN ==================== */
+.scanner-laser-line {
+  position: absolute;
+  left: 8%;
+  right: 8%;
+  height: 2px;
+  top: 12%;
+  background: linear-gradient(90deg, transparent, #ef4444, transparent);
+  box-shadow: 0 0 8px rgba(239, 68, 68, 0.7);
+  animation: scannerSweep 2.2s ease-in-out infinite;
+}
+
+@keyframes scannerSweep {
+  0%, 100% { top: 12%; }
+  50% { top: 82%; }
+}
+
+/* ==================== RECEIPT ==================== */
+#printable-receipt {
+  font-family: 'Courier New', Courier, monospace;
+}
+
+/* ==================== PRINTING ==================== */
+@media print {
+  .no-print,
+  .sidebar,
+  .sidebar-backdrop,
+  .top-navbar,
+  .app-footer,
+  .toast-container,
+  .modal-backdrop {
+    display: none !important;
+  }
+
+  /* Receipt open: print only the receipt */
+  body.modal-open > .app-wrapper {
+    display: none !important;
+  }
+
+  body.modal-open .modal {
+    position: static !important;
+    display: block !important;
+    overflow: visible !important;
+  }
+
+  body.modal-open .modal-dialog {
+    margin: 0 auto !important;
+    max-width: 380px !important;
+  }
+
+  body.modal-open .modal-content {
+    border: 0 !important;
     box-shadow: none !important;
+  }
+
+  /* Reports page: let the content flow across pages */
+  .app-wrapper,
+  .main-content-wrapper,
+  .content-body {
+    height: auto !important;
+    overflow: visible !important;
   }
 }
