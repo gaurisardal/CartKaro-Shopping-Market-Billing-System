@@ -2926,7 +2926,47 @@ function setupGlobalSearch() {
 // ==========================================================================
 // 15. GLOBAL EVENT LISTENERS & INITIALIZATION
 // ==========================================================================
+// ================= DARK MODE =================
+function initCartKaroThemeToggle() {
+    const topbar = document.querySelector(
+        '.top-navbar .d-flex.align-items-center.gap-2'
+    );
+
+    if (!topbar || document.getElementById('themeToggle')) return;
+
+    const toggle = document.createElement('button');
+    toggle.id = 'themeToggle';
+    toggle.type = 'button';
+    toggle.className = 'btn btn-outline-secondary';
+    toggle.title = 'Toggle dark mode';
+
+    const applyTheme = (theme) => {
+        const isDark = theme === 'dark';
+
+        document.body.classList.toggle('dark-mode', isDark);
+        toggle.innerHTML = isDark
+            ? '<i class="bi bi-sun"></i>'
+            : '<i class="bi bi-moon-stars"></i>';
+
+        localStorage.setItem('cartkaro_theme', theme);
+    };
+
+    toggle.addEventListener('click', () => {
+        const isDark = document.body.classList.contains('dark-mode');
+        applyTheme(isDark ? 'light' : 'dark');
+    });
+
+    topbar.appendChild(toggle);
+
+    const savedTheme = localStorage.getItem('cartkaro_theme');
+    if (savedTheme === 'dark') {
+        applyTheme('dark');
+    } else {
+        applyTheme('light');
+    }
+}
 document.addEventListener('DOMContentLoaded', () => {
+      initCartKaroThemeToggle();
   // 1. Setup Hash Router & Nav buttons
   document.querySelectorAll('.nav-link-btn, .sidebar .nav-link').forEach(link => {
     link.addEventListener('click', e => {
