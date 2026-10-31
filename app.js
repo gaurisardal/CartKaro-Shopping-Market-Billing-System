@@ -1082,7 +1082,7 @@ function renderDashboardSalesChart(period = 'daily') {
           ticks: {
             callback: val => '₹' + val
           },
-          grid: { color: '#f1f5f9' }
+          grid: { color: chartGridColor() }
         },
         x: {
           grid: { display: false }
@@ -1118,7 +1118,7 @@ function renderDashboardPaymentChart() {
         data: [cashTotal, upiTotal, cardTotal],
         backgroundColor: ['#10b981', '#3b82f6', '#8b5cf6'],
         borderWidth: 2,
-        borderColor: '#ffffff'
+        borderColor: chartSliceBorderColor()
       }]
     },
     options: {
@@ -2926,49 +2926,122 @@ function setupGlobalSearch() {
 // ==========================================================================
 // 15. GLOBAL EVENT LISTENERS & INITIALIZATION
 // ==========================================================================
-// ================= DARK MODE TOGGLE =================
-function initCartKaroThemeToggle() {
-    if (document.getElementById('themeToggle')) return;
+// ================= DARK MODE / LIGHT MODE =================
+// The saved choice lives in localStorage under "cartkaro_theme" ("dark" or "light").
+// A tiny script in the <head> of index.html applies the saved theme before the page
+// paints (no white flash); this code then wires up the navbar button.
+// Bootstrap 5.3 switches all of its own components when <html data-bs-theme="dark"> is set;
+// dark-theme.css restyles the custom CartKaro parts on top of that.
+const CartKaroTheme = {
+  KEY: 'cartkaro_theme',
+  _timer: null,
 
-    const toggle = document.createElement('button');
+  read() {
+    try {
+      return localStorage.getItem(this.KEY) === 'dark' ? 'dark' : 'light';
+    } catch (e) {
+      return 'light'; // storage blocked (private mode etc.) - fall back to light
+    }
+  },
 
-    toggle.id = 'themeToggle';
-    toggle.type = 'button';
-    toggle.textContent = '🌙 Dark Mode';
+  save(theme) {
+    try {
+      localStorage.setItem(this.KEY, theme);
+    } catch (e) { /* storage blocked - theme just won't be remembered */ }
+  },
 
-    toggle.style.cssText = `
-        position: fixed;
-        bottom: 25px;
-        right: 25px;
-        z-index: 99999;
-        padding: 12px 20px;
-        border: none;
-        border-radius: 30px;
-        background: #2563eb;
-        color: white;
-        font-size: 14px;
-        font-weight: 600;
-        cursor: pointer;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-    `;
+  isDark() {
+    return document.documentElement.getAttribute('data-bs-theme') === 'dark';
+  },
 
-    function applyTheme(isDark) {
-        document.body.classList.toggle('dark-mode', isDark);
-        toggle.textContent = isDark ? '☀️ Light Mode' : '🌙 Dark Mode';
-        localStorage.setItem('cartkaro_theme', isDark ? 'dark' : 'light');
+  updateButton(dark) {
+    const btn = document.getElementById('theme-toggle-btn');
+    if (!btn) return;
+    const icon = document.getElementById('theme-toggle-icon');
+    const text = document.getElementById('theme-toggle-text');
+    if (icon) icon.className = dark ? 'bi bi-sun-fill' : 'bi bi-moon-stars-fill';
+    if (text) text.textContent = dark ? 'Light' : 'Dark';
+    const label = dark ? 'Switch to light mode' : 'Switch to dark mode';
+    btn.title = label;
+    btn.setAttribute('aria-label', label);
+    btn.setAttribute('aria-pressed', dark ? 'true' : 'false');
+  },
+
+  // Chart.js draws on <canvas>, so CSS cannot recolor it: set its global colors instead.
+  updateChartDefaults(dark) {
+    if (window.Chart && Chart.defaults) {
+      Chart.defaults.color = dark ? '#94a3b8' : '#666666';
+      Chart.defaults.borderColor = dark ? 'rgba(148, 163, 184, 0.18)' : 'rgba(0, 0, 0, 0.1)';
+    }
+  },
+
+  // Redraw only the charts of the visible screen (data comes from the cache, no database call).
+  redrawCharts() {
+    try {
+      if (AppState.currentView === 'dashboard') {
+        const activeBtn = document.querySelector('#dashboard-chart-period-group button.active');
+        renderDashboardSalesChart(activeBtn && activeBtn.dataset.period ? activeBtn.dataset.period : 'daily');
+        renderDashboardPaymentChart();
+      } else if (AppState.currentView === 'reports') {
+        renderReportsSalesTrendChart();
+        renderReportsCategoryChart();
+      }
+    } catch (e) {
+      console.error('[CartKaro] chart redraw after theme change failed:', e);
+    }
+  },
+
+  apply(theme, options) {
+    const opts = options || {};
+    const dark = theme === 'dark';
+    const root = document.documentElement;
+
+    if (opts.animate) {
+      // The smooth transition is only switched on for a moment while the theme changes,
+      // so it never slows down normal hover effects or the sidebar animation.
+      root.classList.add('theme-transition');
+      clearTimeout(this._timer);
+      this._timer = setTimeout(() => root.classList.remove('theme-transition'), 500);
     }
 
-    toggle.addEventListener('click', () => {
-        const isDark = document.body.classList.contains('dark-mode');
-        applyTheme(!isDark);
-    });
+    root.setAttribute('data-bs-theme', dark ? 'dark' : 'light');
+    if (document.body) document.body.classList.toggle('dark-mode', dark);
 
-    document.body.appendChild(toggle);
+    this.updateButton(dark);
+    this.updateChartDefaults(dark);
+    if (opts.save) this.save(dark ? 'dark' : 'light');
+    if (opts.redraw) this.redrawCharts();
+  },
 
-    applyTheme(localStorage.getItem('cartkaro_theme') === 'dark');
+  toggle() {
+    this.apply(this.isDark() ? 'light' : 'dark', { animate: true, save: true, redraw: true });
+  }
+};
+
+function chartGridColor() {
+  return CartKaroTheme.isDark() ? 'rgba(148, 163, 184, 0.15)' : '#f1f5f9';
+}
+
+function chartSliceBorderColor() {
+  return CartKaroTheme.isDark() ? '#111a2e' : '#ffffff';
+}
+
+function initCartKaroTheme() {
+  // Runs first thing on DOMContentLoaded, before any chart is drawn.
+  CartKaroTheme.apply(CartKaroTheme.read());
+
+  const toggleBtn = document.getElementById('theme-toggle-btn');
+  if (toggleBtn) toggleBtn.addEventListener('click', () => CartKaroTheme.toggle());
+
+  // Keep several open tabs in sync when the theme is changed in one of them.
+  window.addEventListener('storage', e => {
+    if (e.key === CartKaroTheme.KEY) {
+      CartKaroTheme.apply(e.newValue === 'dark' ? 'dark' : 'light', { animate: true, redraw: true });
+    }
+  });
 }
 document.addEventListener('DOMContentLoaded', () => {
-      initCartKaroThemeToggle();
+  initCartKaroTheme();
   // 1. Setup Hash Router & Nav buttons
   document.querySelectorAll('.nav-link-btn, .sidebar .nav-link').forEach(link => {
     link.addEventListener('click', e => {
