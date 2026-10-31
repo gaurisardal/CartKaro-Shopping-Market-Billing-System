@@ -2926,44 +2926,46 @@ function setupGlobalSearch() {
 // ==========================================================================
 // 15. GLOBAL EVENT LISTENERS & INITIALIZATION
 // ==========================================================================
-// ================= DARK MODE =================
+// ================= DARK MODE TOGGLE =================
 function initCartKaroThemeToggle() {
-    const topbar = document.querySelector(
-        '.top-navbar .d-flex.align-items-center.gap-2'
-    );
-
-    if (!topbar || document.getElementById('themeToggle')) return;
+    if (document.getElementById('themeToggle')) return;
 
     const toggle = document.createElement('button');
+
     toggle.id = 'themeToggle';
     toggle.type = 'button';
-    toggle.className = 'btn btn-outline-secondary';
-    toggle.title = 'Toggle dark mode';
+    toggle.textContent = '🌙 Dark Mode';
 
-    const applyTheme = (theme) => {
-        const isDark = theme === 'dark';
+    toggle.style.cssText = `
+        position: fixed;
+        bottom: 25px;
+        right: 25px;
+        z-index: 99999;
+        padding: 12px 20px;
+        border: none;
+        border-radius: 30px;
+        background: #2563eb;
+        color: white;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    `;
 
+    function applyTheme(isDark) {
         document.body.classList.toggle('dark-mode', isDark);
-        toggle.innerHTML = isDark
-            ? '<i class="bi bi-sun"></i>'
-            : '<i class="bi bi-moon-stars"></i>';
-
-        localStorage.setItem('cartkaro_theme', theme);
-    };
+        toggle.textContent = isDark ? '☀️ Light Mode' : '🌙 Dark Mode';
+        localStorage.setItem('cartkaro_theme', isDark ? 'dark' : 'light');
+    }
 
     toggle.addEventListener('click', () => {
         const isDark = document.body.classList.contains('dark-mode');
-        applyTheme(isDark ? 'light' : 'dark');
+        applyTheme(!isDark);
     });
 
-    topbar.appendChild(toggle);
+    document.body.appendChild(toggle);
 
-    const savedTheme = localStorage.getItem('cartkaro_theme');
-    if (savedTheme === 'dark') {
-        applyTheme('dark');
-    } else {
-        applyTheme('light');
-    }
+    applyTheme(localStorage.getItem('cartkaro_theme') === 'dark');
 }
 document.addEventListener('DOMContentLoaded', () => {
       initCartKaroThemeToggle();
