@@ -1,7 +1,13 @@
 /**
  * CartKaro - Supermarket Inventory & Billing Management System
- * Pure Vanilla JavaScript Client-Side Application
- * Technology Stack: HTML5, CSS3, JavaScript (ES6+), Bootstrap 5, Chart.js, Browser localStorage
+ * Vanilla JavaScript front end on top of Supabase (PostgreSQL).
+ * Technology Stack: HTML5, CSS3, JavaScript (ES6+), Bootstrap 5, Chart.js, Supabase JS v2
+ *
+ * DATA MODEL: Supabase is the single source of truth. Products, inventory, bills,
+ * bill items, payments, customers and stock movements are read from and written to
+ * the database (writes go through the RPC functions in cartkaro_fix.sql so every
+ * operation is atomic). The in-memory CartKaroStore below is only a cache of the
+ * last successful database read; nothing but shop settings is kept in LocalStorage.
  */
 
 // ==========================================================================
@@ -94,242 +100,50 @@ const DEFAULT_SETTINGS = {
   footerMsg: 'Thank you for shopping at CartKaro! Visit again.'
 };
 
-// Rich Demonstration Catalog
-const SAMPLE_PRODUCTS = [
-  { id: 'PRD-1001', barcode: '8901030000001', name: 'Aashirvaad Superior MP Atta 5kg', category: 'Groceries & Staples', costPrice: 215.00, sellingPrice: 260.00, quantity: 45, minStock: 10, supplier: 'ITC Limited', expiryDate: '2027-02-15' },
-  { id: 'PRD-1002', barcode: '8901030000002', name: 'India Gate Basmati Rice Feast Rozzana 5kg', category: 'Groceries & Staples', costPrice: 380.00, sellingPrice: 465.00, quantity: 30, minStock: 10, supplier: 'KRBL Foods', expiryDate: '2027-06-20' },
-  { id: 'PRD-1003', barcode: '8901030000003', name: 'Tata Salt Vacuum Evaporated 1kg', category: 'Groceries & Staples', costPrice: 22.00, sellingPrice: 28.00, quantity: 60, minStock: 15, supplier: 'Tata Consumer', expiryDate: '2027-12-31' },
-  { id: 'PRD-1004', barcode: '8901030000004', name: 'Fortune Sunlite Refined Sunflower Oil 1L', category: 'Groceries & Staples', costPrice: 118.00, sellingPrice: 145.00, quantity: 40, minStock: 12, supplier: 'Adani Wilmar', expiryDate: '2027-03-10' },
-  { id: 'PRD-1005', barcode: '8901030000005', name: 'Tata Sampann Unpolished Toor Dal 1kg', category: 'Groceries & Staples', costPrice: 135.00, sellingPrice: 168.00, quantity: 8, minStock: 10, supplier: 'Tata Consumer', expiryDate: '2027-05-18' },
-  
-  { id: 'PRD-1006', barcode: '8901030000006', name: 'Amul Pasteurised Butter 500g', category: 'Dairy & Bakery', costPrice: 225.00, sellingPrice: 275.00, quantity: 6, minStock: 10, supplier: 'GCMMF Amul', expiryDate: '2026-11-20' },
-  { id: 'PRD-1007', barcode: '8901030000007', name: 'Amul Taaza Homogenised Toned Milk 1L', category: 'Dairy & Bakery', costPrice: 62.00, sellingPrice: 74.00, quantity: 25, minStock: 10, supplier: 'GCMMF Amul', expiryDate: '2026-11-05' },
-  { id: 'PRD-1008', barcode: '8901030000008', name: 'Britannia 100% Whole Wheat Bread 400g', category: 'Dairy & Bakery', costPrice: 38.00, sellingPrice: 50.00, quantity: 18, minStock: 8, supplier: 'Britannia Industries', expiryDate: '2026-11-02' },
-  { id: 'PRD-1009', barcode: '8901030000009', name: 'Mother Dairy Classic Malai Paneer 200g', category: 'Dairy & Bakery', costPrice: 75.00, sellingPrice: 95.00, quantity: 0, minStock: 10, supplier: 'Mother Dairy', expiryDate: '2026-11-04' },
-  
-  { id: 'PRD-1010', barcode: '8901030000010', name: 'Nescafe Classic 100% Pure Instant Coffee 100g', category: 'Beverages', costPrice: 260.00, sellingPrice: 325.00, quantity: 22, minStock: 8, supplier: 'Nestle India', expiryDate: '2027-09-30' },
-  { id: 'PRD-1011', barcode: '8901030000011', name: 'Tata Tea Gold Leaf Tea 500g', category: 'Beverages', costPrice: 290.00, sellingPrice: 360.00, quantity: 7, minStock: 10, supplier: 'Tata Consumer', expiryDate: '2027-08-15' },
-  { id: 'PRD-1012', barcode: '8901030000012', name: 'Tropicana 100% Real Orange Juice 1L', category: 'Beverages', costPrice: 105.00, sellingPrice: 135.00, quantity: 15, minStock: 8, supplier: 'PepsiCo India', expiryDate: '2027-01-25' },
-  { id: 'PRD-1013', barcode: '8901030000013', name: 'Coca-Cola Original Taste Pet Bottle 750ml', category: 'Beverages', costPrice: 32.00, sellingPrice: 40.00, quantity: 50, minStock: 15, supplier: 'Hindustan Coca-Cola', expiryDate: '2027-04-10' },
-
-  { id: 'PRD-1014', barcode: '8901030000014', name: 'Maggi 2-Minute Masala Instant Noodles 280g (Pack of 4)', category: 'Snacks & Packaged Food', costPrice: 48.00, sellingPrice: 58.00, quantity: 5, minStock: 12, supplier: 'Nestle India', expiryDate: '2027-07-20' },
-  { id: 'PRD-1015', barcode: '8901030000015', name: 'Cadbury Dairy Milk Silk Chocolate Bar 60g', category: 'Snacks & Packaged Food', costPrice: 65.00, sellingPrice: 80.00, quantity: 35, minStock: 10, supplier: 'Mondelez India', expiryDate: '2027-06-30' },
-  { id: 'PRD-1016', barcode: '8901030000016', name: 'Britannia Good Day Cashew Cookies 200g', category: 'Snacks & Packaged Food', costPrice: 38.00, sellingPrice: 50.00, quantity: 42, minStock: 10, supplier: 'Britannia Industries', expiryDate: '2027-05-15' },
-
-  { id: 'PRD-1017', barcode: '8901030000017', name: 'Dettol Original Germ Protection Handwash 200ml', category: 'Personal Care & Hygiene', costPrice: 78.00, sellingPrice: 99.00, quantity: 28, minStock: 8, supplier: 'Reckitt Benckiser', expiryDate: '2027-11-30' },
-  { id: 'PRD-1018', barcode: '8901030000018', name: 'Surf Excel Easy Wash Detergent Powder 1kg', category: 'Household Essentials', costPrice: 115.00, sellingPrice: 140.00, quantity: 34, minStock: 10, supplier: 'Hindustan Unilever', expiryDate: '2028-01-01' }
-];
-
-// Rich Demonstration Past Bills
-function generateSampleBills() {
-  const now = new Date();
-  const d = (offsetDays, hours = 14, mins = 30) => {
-    const target = new Date(now);
-    target.setDate(now.getDate() - offsetDays);
-    target.setHours(hours, mins, 0, 0);
-    return target.toISOString();
-  };
-
-  return [
-    {
-      billNo: 'BILL-1001',
-      date: d(0, 11, 20),
-      customerName: 'Rahul Sharma',
-      customerPhone: '9845012345',
-      items: [
-        { productId: 'PRD-1001', name: 'Aashirvaad Superior MP Atta 5kg', barcode: '8901030000001', rate: 260.00, quantity: 1, amount: 260.00 },
-        { productId: 'PRD-1003', name: 'Tata Salt Vacuum Evaporated 1kg', barcode: '8901030000003', rate: 28.00, quantity: 2, amount: 56.00 },
-        { productId: 'PRD-1006', name: 'Amul Pasteurised Butter 500g', barcode: '8901030000006', rate: 275.00, quantity: 1, amount: 275.00 }
-      ],
-      subtotal: 591.00,
-      discountType: 'percent',
-      discountValue: 5,
-      discountAmount: 29.55,
-      gstRate: 5,
-      gstAmount: 28.07,
-      grandTotal: 589.52,
-      paymentMethod: 'UPI',
-      amountPaid: 589.52,
-      changeDue: 0,
-      status: 'Completed'
-    },
-    {
-      billNo: 'BILL-1002',
-      date: d(0, 14, 45),
-      customerName: 'Pooja Iyer',
-      customerPhone: '9820054321',
-      items: [
-        { productId: 'PRD-1002', name: 'India Gate Basmati Rice Feast Rozzana 5kg', barcode: '8901030000002', rate: 465.00, quantity: 1, amount: 465.00 },
-        { productId: 'PRD-1004', name: 'Fortune Sunlite Refined Sunflower Oil 1L', barcode: '8901030000004', rate: 145.00, quantity: 2, amount: 290.00 }
-      ],
-      subtotal: 755.00,
-      discountType: 'fixed',
-      discountValue: 0,
-      discountAmount: 0,
-      gstRate: 5,
-      gstAmount: 37.75,
-      grandTotal: 792.75,
-      paymentMethod: 'Cash',
-      amountPaid: 800.00,
-      changeDue: 7.25,
-      status: 'Completed'
-    },
-    {
-      billNo: 'BILL-1003',
-      date: d(1, 16, 10),
-      customerName: 'Vikram Mehta',
-      customerPhone: '9711098765',
-      items: [
-        { productId: 'PRD-1010', name: 'Nescafe Classic 100% Pure Instant Coffee 100g', barcode: '8901030000010', rate: 325.00, quantity: 1, amount: 325.00 },
-        { productId: 'PRD-1015', name: 'Cadbury Dairy Milk Silk Chocolate Bar 60g', barcode: '8901030000015', rate: 80.00, quantity: 2, amount: 160.00 },
-        { productId: 'PRD-1016', name: 'Britannia Good Day Cashew Cookies 200g', barcode: '8901030000016', rate: 50.00, quantity: 2, amount: 100.00 }
-      ],
-      subtotal: 585.00,
-      discountType: 'percent',
-      discountValue: 10,
-      discountAmount: 58.50,
-      gstRate: 5,
-      gstAmount: 26.33,
-      grandTotal: 552.83,
-      paymentMethod: 'Card',
-      amountPaid: 552.83,
-      changeDue: 0,
-      cardRef: 'AUTH-783210',
-      status: 'Completed'
-    },
-    {
-      billNo: 'BILL-1004',
-      date: d(2, 18, 30),
-      customerName: 'Ananya Verma',
-      customerPhone: '9988776655',
-      items: [
-        { productId: 'PRD-1018', name: 'Surf Excel Easy Wash Detergent Powder 1kg', barcode: '8901030000018', rate: 140.00, quantity: 2, amount: 280.00 },
-        { productId: 'PRD-1017', name: 'Dettol Original Germ Protection Handwash 200ml', barcode: '8901030000017', rate: 99.00, quantity: 1, amount: 99.00 }
-      ],
-      subtotal: 379.00,
-      discountType: 'fixed',
-      discountValue: 0,
-      discountAmount: 0,
-      gstRate: 5,
-      gstAmount: 18.95,
-      grandTotal: 397.95,
-      paymentMethod: 'UPI',
-      amountPaid: 397.95,
-      changeDue: 0,
-      status: 'Completed'
-    },
-    {
-      billNo: 'BILL-1005',
-      date: d(3, 12, 15),
-      customerName: 'Suresh Patel',
-      customerPhone: '9425011223',
-      items: [
-        { productId: 'PRD-1001', name: 'Aashirvaad Superior MP Atta 5kg', barcode: '8901030000001', rate: 260.00, quantity: 2, amount: 520.00 },
-        { productId: 'PRD-1002', name: 'India Gate Basmati Rice Feast Rozzana 5kg', barcode: '8901030000002', rate: 465.00, quantity: 1, amount: 465.00 },
-        { productId: 'PRD-1011', name: 'Tata Tea Gold Leaf Tea 500g', barcode: '8901030000011', rate: 360.00, quantity: 1, amount: 360.00 }
-      ],
-      subtotal: 1345.00,
-      discountType: 'percent',
-      discountValue: 5,
-      discountAmount: 67.25,
-      gstRate: 5,
-      gstAmount: 63.89,
-      grandTotal: 1341.64,
-      paymentMethod: 'Cash',
-      amountPaid: 1500.00,
-      changeDue: 158.36,
-      status: 'Completed'
-    },
-    {
-      billNo: 'BILL-1006',
-      date: d(4, 15, 0),
-      customerName: 'Deepak Rao',
-      customerPhone: '9844099887',
-      items: [
-        { productId: 'PRD-1013', name: 'Coca-Cola Original Taste Pet Bottle 750ml', barcode: '8901030000013', rate: 40.00, quantity: 3, amount: 120.00 },
-        { productId: 'PRD-1014', name: 'Maggi 2-Minute Masala Instant Noodles 280g', barcode: '8901030000014', rate: 58.00, quantity: 2, amount: 116.00 }
-      ],
-      subtotal: 236.00,
-      discountType: 'fixed',
-      discountValue: 0,
-      discountAmount: 0,
-      gstRate: 5,
-      gstAmount: 11.80,
-      grandTotal: 247.80,
-      paymentMethod: 'UPI',
-      amountPaid: 247.80,
-      changeDue: 0,
-      status: 'Completed'
-    }
-  ];
-}
-
 const CartKaroStore = {
-  getProducts() {
-    const raw = localStorage.getItem(STORAGE_KEYS.PRODUCTS);
-    return raw ? JSON.parse(raw) : [];
+  // In-memory cache of what was last read from Supabase. NOT persisted anywhere.
+  _products: [],
+  _bills: [],
+  _movements: [],
+
+  getProducts() { return this._products; },
+  setProducts(products) { this._products = Array.isArray(products) ? products : []; },
+  getBills() { return this._bills; },
+  setBills(bills) { this._bills = Array.isArray(bills) ? bills : []; },
+  getMovements() { return this._movements; },
+  setMovements(movs) { this._movements = Array.isArray(movs) ? movs : []; },
+  clearData() {
+    this._products = [];
+    this._bills = [];
+    this._movements = [];
   },
-  saveProducts(products) {
-    localStorage.setItem(STORAGE_KEYS.PRODUCTS, JSON.stringify(products));
-  },
-  getBills() {
-    const raw = localStorage.getItem(STORAGE_KEYS.BILLS);
-    return raw ? JSON.parse(raw) : [];
-  },
-  saveBills(bills) {
-    localStorage.setItem(STORAGE_KEYS.BILLS, JSON.stringify(bills));
-  },
-  getMovements() {
-    const raw = localStorage.getItem(STORAGE_KEYS.MOVEMENTS);
-    return raw ? JSON.parse(raw) : [];
-  },
-  saveMovements(movs) {
-    localStorage.setItem(STORAGE_KEYS.MOVEMENTS, JSON.stringify(movs));
-  },
-  logMovement(movement) {
-    const movs = this.getMovements();
-    movs.unshift({
-      id: 'MOV-' + Date.now().toString(36).toUpperCase(),
-      date: new Date().toISOString(),
-      ...movement
-    });
-    this.saveMovements(movs);
-  },
+
+  // Shop settings (name, address, GST defaults...) have no database table, so they stay local.
   getSettings() {
-    const raw = localStorage.getItem(STORAGE_KEYS.SETTINGS);
-    return raw ? JSON.parse(raw) : { ...DEFAULT_SETTINGS };
+    try {
+      const raw = localStorage.getItem(STORAGE_KEYS.SETTINGS);
+      return raw ? { ...DEFAULT_SETTINGS, ...JSON.parse(raw) } : { ...DEFAULT_SETTINGS };
+    } catch (e) {
+      console.error('Could not read saved settings, using defaults:', e);
+      return { ...DEFAULT_SETTINGS };
+    }
   },
   saveSettings(settings) {
     localStorage.setItem(STORAGE_KEYS.SETTINGS, JSON.stringify(settings));
   },
-  initSeedData(force = false) {
-    if (force || !localStorage.getItem(STORAGE_KEYS.PRODUCTS)) {
-      this.saveProducts(SAMPLE_PRODUCTS);
-      this.saveBills(generateSampleBills());
-      this.saveSettings(DEFAULT_SETTINGS);
-      
-      // Seed initial movement logs
-      const initialLogs = SAMPLE_PRODUCTS.map(p => ({
-        id: 'MOV-' + Math.random().toString(36).substr(2, 9).toUpperCase(),
-        date: new Date(Date.now() - 86400000 * 5).toISOString(),
-        productId: p.id,
-        productName: p.name,
-        barcode: p.barcode,
-        type: 'STOCK_IN',
-        quantity: p.quantity,
-        previousStock: 0,
-        newStock: p.quantity,
-        reason: 'Initial Inventory Setup'
-      }));
-      this.saveMovements(initialLogs);
-      return true;
-    }
-    return false;
+
+  // Old versions of this app kept demo products/bills/movements in LocalStorage.
+  // Remove them so stale demo data can never be shown as if it were real.
+  purgeLegacyLocalData() {
+    try {
+      localStorage.removeItem(STORAGE_KEYS.PRODUCTS);
+      localStorage.removeItem(STORAGE_KEYS.BILLS);
+      localStorage.removeItem(STORAGE_KEYS.MOVEMENTS);
+    } catch (e) { /* storage unavailable - nothing to purge */ }
   }
 };
 
-// Initialize Store
-CartKaroStore.initSeedData();
+CartKaroStore.purgeLegacyLocalData();
 
 // ==========================================================================
 // 2B. SUPABASE DATABASE & AUTH SERVICE
@@ -422,8 +236,9 @@ const SupabaseService = {
   },
 
   /**
-   * Safe Read-Only Product Fetching
-   * Queries products table with join on inventory table
+   * Product fetching (products joined with inventory).
+   * Only active products are listed; archived products stay in the database
+   * so old bills keep their history.
    */
   async fetchProducts() {
     if (!this.client) {
@@ -431,18 +246,29 @@ const SupabaseService = {
     }
 
     try {
-      const { data, error, status } = await this.client
-        .from('products')
-        .select('product_id, product_name, barcode, category, price, tax_rate, unit, inventory(quantity, reorder_level, last_updated)')
-        .order('product_id', { ascending: true });
+      const PAGE = 1000;
+      let from = 0;
+      let rows = [];
+      for (;;) {
+        const { data, error } = await this.client
+          .from('products')
+          .select('product_id, product_name, barcode, category, price, tax_rate, unit, cost_price, supplier, expiry_date, is_active, inventory(quantity, reorder_level, last_updated)')
+          .eq('is_active', true)
+          .order('product_id', { ascending: true })
+          .range(from, from + PAGE - 1);
 
-      if (error) {
-        this.lastRlsStatus = 'error';
-        this.lastError = error;
-        return { error };
+        if (error) {
+          this.lastRlsStatus = 'error';
+          this.lastError = error;
+          console.error('[CartKaro] fetchProducts failed:', error);
+          return { error };
+        }
+        rows = rows.concat(data || []);
+        if (!data || data.length < PAGE) break;
+        from += PAGE;
       }
 
-      if (!data || data.length === 0) {
+      if (rows.length === 0) {
         const session = await this.checkAuth();
         this.lastRlsStatus = session ? 'empty_table' : 'restricted';
         return { data: [], isRlsRestricted: !session };
@@ -450,10 +276,11 @@ const SupabaseService = {
 
       this.lastRlsStatus = 'ok';
 
-      // Map Supabase columns to frontend JavaScript product model
-      const mapped = data.map(p => {
+      // Map Supabase columns to the frontend JavaScript product model
+      const mapped = rows.map(p => {
         const inv = Array.isArray(p.inventory) ? p.inventory[0] : p.inventory;
         const sellingPrice = parseFloat(p.price || 0);
+        const hasCost = p.cost_price !== null && p.cost_price !== undefined;
         return {
           id: 'PRD-' + p.product_id,
           dbId: p.product_id,
@@ -461,13 +288,13 @@ const SupabaseService = {
           barcode: p.barcode || ('890103' + String(p.product_id).padStart(7, '0')),
           category: p.category,
           sellingPrice: sellingPrice,
-          costPrice: parseFloat((sellingPrice * 0.8).toFixed(2)),
+          costPrice: hasCost ? parseFloat(p.cost_price) : parseFloat((sellingPrice * 0.8).toFixed(2)),
           taxRate: parseFloat(p.tax_rate || 0),
           unit: p.unit || 'pack',
           quantity: inv ? parseFloat(inv.quantity || 0) : 0,
           minStock: inv ? parseFloat(inv.reorder_level || 10) : 10,
-          supplier: 'Supermarket Inventory',
-          expiryDate: '',
+          supplier: p.supplier || '',
+          expiryDate: p.expiry_date || '',
           fromSupabase: true
         };
       });
@@ -504,10 +331,395 @@ const SupabaseService = {
     this.updateStatusBadge();
   }
 };
+
+// ==========================================================================
+// 2C. DATABASE ACCESS LAYER (reads, RPC writes, error handling, cache refresh)
+// ==========================================================================
+class DbError extends Error {
+  constructor(message, code, cause) {
+    super(message);
+    this.name = 'DbError';
+    this.code = code || null;
+    this.cause = cause || null;
+  }
+}
+
+// Turn a Supabase / PostgreSQL / network error into a message a cashier can act on.
+function describeDbError(err) {
+  const raw = (err && err.message) ? String(err.message) : String(err || 'Unknown error');
+  const code = err && err.code ? String(err.code) : '';
+
+  // Errors raised on purpose by the functions in cartkaro_fix.sql look like "CODE: message".
+  const known = raw.match(/^(INSUFFICIENT_STOCK|INSUFFICIENT_PAYMENT|INVALID_[A-Z_]+|EMPTY_CART|PRODUCT_NOT_FOUND|BILL_NOT_FOUND|BILL_NOT_VOIDABLE|ALLOCATION_ERROR):\s*([\s\S]*)$/);
+  if (known) return known[2];
+
+  if (code === 'PGRST202' || /Could not find the function/i.test(raw)) {
+    return 'The database is missing the CartKaro functions. Run cartkaro_fix.sql in the Supabase SQL Editor, then reload this page.';
+  }
+  if (code === '42703' || /column .* does not exist/i.test(raw)) {
+    return 'The database is missing columns added by cartkaro_fix.sql. Run that file in the Supabase SQL Editor, then reload this page.';
+  }
+  if (code === '23505') {
+    return /barcode/i.test(raw)
+      ? 'This barcode is already used by another product.'
+      : 'A record with the same unique value already exists.';
+  }
+  if (code === '23503') return 'This record is linked to other data and cannot be changed this way.';
+  if (code === '23514') return 'The database rejected a value that is out of range (' + raw + ').';
+  if (code === '42501' || /row-level security|permission denied/i.test(raw)) {
+    return 'The database refused this action (security policy). Sign in with a staff account and try again.';
+  }
+  if (/JWT|token is expired|not authenticated/i.test(raw)) {
+    return 'Your staff session has expired. Sign in again and retry.';
+  }
+  if (/Failed to fetch|NetworkError|Load failed|network/i.test(raw)) {
+    return 'Cannot reach Supabase. Check the internet connection and retry.';
+  }
+  return raw;
+}
+
+function wrapDbError(err) {
+  if (err instanceof DbError) return err;
+  return new DbError(describeDbError(err), err && err.code, err);
+}
+
+function toNum(value, fallback = 0) {
+  const n = parseFloat(value);
+  return Number.isNaN(n) ? fallback : n;
+}
+const round2 = n => Math.round((Number(n) + Number.EPSILON) * 100) / 100;
+const round3 = n => Math.round((Number(n) + Number.EPSILON) * 1000) / 1000;
+
+function esc(value) {
+  return String(value === null || value === undefined ? '' : value)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+function newRequestId() {
+  if (window.crypto && typeof window.crypto.randomUUID === 'function') return window.crypto.randomUUID();
+  const b = new Uint8Array(16);
+  (window.crypto || window.msCrypto).getRandomValues(b);
+  b[6] = (b[6] & 0x0f) | 0x40;
+  b[8] = (b[8] & 0x3f) | 0x80;
+  const h = Array.from(b, x => x.toString(16).padStart(2, '0')).join('');
+  return `${h.slice(0, 8)}-${h.slice(8, 12)}-${h.slice(12, 16)}-${h.slice(16, 20)}-${h.slice(20)}`;
+}
+
+const PAYMENT_LABELS = { CASH: 'Cash', CARD: 'Card', UPI: 'UPI' };
+const BILL_STATUS_LABELS = { PAID: 'Completed', CANCELLED: 'Returned', REFUNDED: 'Returned', PENDING: 'Pending' };
+
+// Build the frontend bill shape (used by dashboard, sales history, receipts, reports)
+function buildBillModel(src) {
+  const subtotal = toNum(src.subtotal);
+  const discountAmount = toNum(src.discount);
+  const gstAmount = toNum(src.tax_amount);
+  const taxable = subtotal - discountAmount;
+  const grandTotal = toNum(src.grand_total);
+  const gstRate = src.gst_rate !== null && src.gst_rate !== undefined
+    ? toNum(src.gst_rate)
+    : (taxable > 0 ? round2((gstAmount / taxable) * 100) : 0);
+  const method = PAYMENT_LABELS[String(src.payment_method || '').toUpperCase()] || src.payment_method || '';
+  const isCash = method === 'Cash';
+  const tendered = src.amount_tendered !== null && src.amount_tendered !== undefined ? toNum(src.amount_tendered) : grandTotal;
+
+  return {
+    billId: src.bill_id,
+    billNo: src.bill_number || ('BILL-' + (1000 + Number(src.bill_id))),
+    date: new Date(src.bill_date).toISOString(),
+    customerId: src.customer_id || null,
+    customerName: src.customer_name || 'Walk-in Customer',
+    customerPhone: src.customer_phone || '',
+    items: src.items,
+    subtotal,
+    discountType: src.discount_type || 'fixed',
+    discountValue: src.discount_value !== null && src.discount_value !== undefined ? toNum(src.discount_value) : discountAmount,
+    discountAmount,
+    gstRate,
+    gstAmount,
+    grandTotal,
+    paymentMethod: method,
+    amountPaid: isCash ? tendered : grandTotal,
+    changeDue: isCash && src.change_due !== null && src.change_due !== undefined ? toNum(src.change_due) : 0,
+    cardRef: src.reference || '',
+    status: BILL_STATUS_LABELS[src.status] || src.status || 'Completed'
+  };
+}
+
+function buildBillItem(i, prodName, prodBarcode, prodCost) {
+  const rate = toNum(i.unit_price);
+  const quantity = toNum(i.quantity);
+  return {
+    productId: 'PRD-' + i.product_id,
+    dbId: i.product_id,
+    name: prodName || ('Product #' + i.product_id),
+    barcode: prodBarcode || '',
+    rate,
+    quantity,
+    amount: round2(rate * quantity),
+    costPrice: prodCost !== null && prodCost !== undefined ? toNum(prodCost) : round2(rate * 0.8)
+  };
+}
+
+// Row from the nested bills select
+function mapBillRow(b) {
+  const customer = Array.isArray(b.customers) ? b.customers[0] : b.customers;
+  const pays = Array.isArray(b.payments) ? b.payments : (b.payments ? [b.payments] : []);
+  const pay = pays[0] || {};
+  const items = (b.bill_items || []).map(i => {
+    const prod = Array.isArray(i.products) ? i.products[0] : i.products;
+    return buildBillItem(i, prod && prod.product_name, prod && prod.barcode, prod && prod.cost_price);
+  });
+  return buildBillModel({
+    bill_id: b.bill_id,
+    bill_number: b.bill_number,
+    bill_date: b.bill_date,
+    customer_id: b.customer_id,
+    customer_name: customer && customer.customer_name,
+    customer_phone: customer && customer.phone,
+    subtotal: b.subtotal,
+    discount: b.discount,
+    tax_amount: b.tax_amount,
+    grand_total: b.grand_total,
+    payment_method: b.payment_method,
+    status: b.status,
+    discount_type: b.discount_type,
+    discount_value: b.discount_value,
+    gst_rate: b.gst_rate,
+    amount_tendered: pay.amount_tendered,
+    change_due: pay.change_due,
+    reference: pay.reference,
+    items
+  });
+}
+
+// JSON returned by create_sale / void_bill (public.get_bill_json)
+function mapRpcBill(j) {
+  const items = (j.items || []).map(i => buildBillItem(i, i.name, i.barcode, null));
+  return buildBillModel({ ...j, items });
+}
+
+const CartKaroDB = {
+  PAGE: 1000,
+  _chain: Promise.resolve(),
+
+  /** Every write requires a real staff session. A "Connected" badge is not enough. */
+  async requireSession() {
+    if (!SupabaseService.client) {
+      throw new DbError('Supabase is not available (the library did not load). Check the internet connection and reload.', 'NO_CLIENT');
+    }
+    let result;
+    try {
+      result = await SupabaseService.client.auth.getSession();
+    } catch (e) {
+      throw wrapDbError(e);
+    }
+    const session = result && result.data && result.data.session;
+    if (!session) {
+      SupabaseService.isAuthenticated = false;
+      SupabaseService.currentUser = null;
+      SupabaseService.updateStatusBadge();
+      throw new DbError('Please sign in with your staff account (click the Supabase badge at the top) before saving data.', 'AUTH_REQUIRED');
+    }
+    SupabaseService.isAuthenticated = true;
+    SupabaseService.currentUser = session.user;
+    return session;
+  },
+
+  /** Call a PostgreSQL function. Throws DbError with a readable message on any failure. */
+  async rpc(name, args) {
+    await this.requireSession();
+    let res;
+    try {
+      res = await SupabaseService.client.rpc(name, args);
+    } catch (e) {
+      console.error(`[CartKaro] rpc ${name} threw:`, e);
+      throw wrapDbError(e);
+    }
+    if (res.error) {
+      console.error(`[CartKaro] rpc ${name} failed:`, res.error, args);
+      throw wrapDbError(res.error);
+    }
+    return res.data;
+  },
+
+  async fetchAllPages(buildQuery, label) {
+    let from = 0;
+    let rows = [];
+    for (;;) {
+      const { data, error } = await buildQuery().range(from, from + this.PAGE - 1);
+      if (error) {
+        console.error(`[CartKaro] fetch ${label} failed:`, error);
+        throw wrapDbError(error);
+      }
+      rows = rows.concat(data || []);
+      if (!data || data.length < this.PAGE) break;
+      from += this.PAGE;
+    }
+    return rows;
+  },
+
+  async fetchBills() {
+    const rows = await this.fetchAllPages(() => SupabaseService.client
+      .from('bills')
+      .select('bill_id, bill_number, bill_date, customer_id, subtotal, discount, tax_amount, grand_total, payment_method, status, discount_type, discount_value, gst_rate, customers(customer_name, phone), bill_items(product_id, quantity, unit_price, discount, tax_amount, line_total, products(product_name, barcode, cost_price)), payments(payment_method, payment_status, amount, amount_tendered, change_due, reference)')
+      .order('bill_date', { ascending: false })
+      .order('bill_id', { ascending: false }), 'bills');
+    return rows.map(mapBillRow);
+  },
+
+  async fetchMovements(products, bills) {
+    const { data, error } = await SupabaseService.client
+      .from('stock_transactions')
+      .select('transaction_id, product_id, transaction_type, quantity_change, transaction_date, reference_id, products(product_name, barcode)')
+      .order('transaction_date', { ascending: false })
+      .order('transaction_id', { ascending: false })
+      .limit(500);
+    if (error) {
+      console.error('[CartKaro] fetch stock_transactions failed:', error);
+      throw wrapDbError(error);
+    }
+
+    // Walk backwards from today's stock so each row shows "previous -> new" stock.
+    const running = new Map(products.map(p => [p.dbId, p.quantity]));
+    const billNoById = new Map(bills.map(b => [String(b.billId), b.billNo]));
+
+    return (data || []).map(t => {
+      const prod = Array.isArray(t.products) ? t.products[0] : t.products;
+      const change = toNum(t.quantity_change);
+      let newStock = '—';
+      let previousStock = '—';
+      if (running.has(t.product_id)) {
+        newStock = running.get(t.product_id);
+        previousStock = round3(newStock - change);
+        running.set(t.product_id, previousStock);
+      }
+
+      const ref = t.reference_id || '';
+      let reason = ref;
+      if (t.transaction_type === 'SALE') {
+        reason = `Bill Sale Invoice #${billNoById.get(ref) || ('BILL-' + (1000 + Number(ref)))}`;
+      } else if (ref.indexOf('VOID-') === 0) {
+        reason = `Return/Void Restock for ${ref.slice(5)}`;
+      }
+
+      return {
+        id: 'TX-' + t.transaction_id,
+        date: new Date(t.transaction_date).toISOString(),
+        productId: 'PRD-' + t.product_id,
+        productName: (prod && prod.product_name) || ('Product #' + t.product_id),
+        barcode: (prod && prod.barcode) || '',
+        type: t.transaction_type === 'SALE' ? 'SALE' : (change > 0 ? 'STOCK_IN' : 'STOCK_OUT'),
+        quantity: Math.abs(change),
+        previousStock,
+        newStock,
+        reason
+      };
+    });
+  },
+
+  /**
+   * Re-read products, inventory, bills and stock movements from Supabase,
+   * replace the cache, and redraw the current view.
+   * Resolves { ok: true } or { ok: false, error }. Never throws.
+   */
+  refreshAll() {
+    const run = () => this._refreshOnce();
+    this._chain = this._chain.then(run, run);
+    return this._chain;
+  },
+
+  async _refreshOnce() {
+    try {
+      await this.requireSession();
+
+      const prodRes = await SupabaseService.fetchProducts();
+      if (prodRes.error) throw wrapDbError(prodRes.error);
+      const products = prodRes.data || [];
+
+      const bills = await this.fetchBills();
+      const movements = await this.fetchMovements(products, bills);
+
+      CartKaroStore.setProducts(products);
+      CartKaroStore.setBills(bills);
+      CartKaroStore.setMovements(movements);
+
+      AppState.lastSync = new Date();
+      AppState.syncError = null;
+      this.updateStorageLabel();
+      this.rerender();
+      return { ok: true };
+    } catch (err) {
+      const e = wrapDbError(err);
+      console.error('[CartKaro] refreshAll failed:', err);
+      AppState.syncError = e.message;
+      if (e.code === 'AUTH_REQUIRED') {
+        CartKaroStore.clearData();
+        this.rerender();
+      }
+      this.updateStorageLabel();
+      return { ok: false, error: e };
+    }
+  },
+
+  rerender() {
+    try {
+      renderView(AppState.currentView);
+      updateStockAlertsBadge();
+    } catch (e) {
+      console.error('[CartKaro] re-render failed:', e);
+    }
+  },
+
+  /** Footer label: shows where the data really comes from. */
+  updateStorageLabel() {
+    const el = document.querySelector('.app-footer span.fw-semibold');
+    if (!el) return;
+    if (AppState.syncError) {
+      el.className = 'text-danger fw-semibold';
+      el.innerHTML = '<i class="bi bi-exclamation-triangle me-1"></i>Supabase sync failed (see console)';
+      el.title = AppState.syncError;
+    } else if (AppState.lastSync) {
+      el.className = 'text-success fw-semibold';
+      el.innerHTML = '<i class="bi bi-database-check me-1"></i>Supabase PostgreSQL (live) &middot; synced ' +
+        esc(AppState.lastSync.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' }));
+      el.title = '';
+    } else {
+      el.className = 'text-warning fw-semibold';
+      el.innerHTML = '<i class="bi bi-database-lock me-1"></i>Supabase PostgreSQL &middot; sign in to load data';
+      el.title = '';
+    }
+  }
+};
+
+// Disable a button while an async action runs; returns a function that restores it.
+function lockButton(btn, busyHtml) {
+  if (!btn) return () => {};
+  const original = btn.innerHTML;
+  const wasDisabled = btn.disabled;
+  btn.disabled = true;
+  if (busyHtml) btn.innerHTML = busyHtml;
+  return () => {
+    btn.innerHTML = original;
+    btn.disabled = wasDisabled;
+  };
+}
+
 const AppState = {
   currentView: 'dashboard',
   cart: [],
-  cartBillNo: 'BILL-1007',
+  cartBillNo: 'AUTO',
+  lastSync: null,
+  syncError: null,
+  checkoutInFlight: false,
+  checkoutAttempt: null,
+  savingProduct: false,
+  savingStock: false,
+  voidingBill: false,
+  editOrigQty: null,
   productsPage: 1,
   productsPerPage: 10,
   salesPage: 1,
@@ -559,11 +771,8 @@ function openConfirmModal({ title, message, iconClass = 'bi-exclamation-triangle
 
 // Generate Next Bill Number
 function getNextBillNumber() {
-  const bills = CartKaroStore.getBills();
-  if (!bills || bills.length === 0) return 'BILL-1001';
-  const nums = bills.map(b => parseInt(b.billNo.replace('BILL-', ''), 10)).filter(n => !isNaN(n));
-  const max = Math.max(...nums, 1000);
-  return 'BILL-' + (max + 1);
+  // The real bill number (BILL-1013 style) is assigned by the database when the sale is saved.
+  return 'AUTO';
 }
 
 // ==========================================================================
@@ -1223,14 +1432,13 @@ function openProductModal(mode = 'add', prodId = null) {
   const titleEl = document.getElementById('productModalLabel');
   const idInput = document.getElementById('prod-id');
   const barcodeInput = document.getElementById('prod-barcode');
+  AppState.editOrigQty = null;
 
   if (mode === 'add') {
     titleEl.innerHTML = '<i class="bi bi-plus-circle me-2"></i>Add New Product';
-    idInput.removeAttribute('readonly');
-    // Generate new unique ID
-    const products = CartKaroStore.getProducts();
-    const nextNum = products.length + 1001;
-    idInput.value = `PRD-${nextNum}`;
+    // The database assigns the real product ID (PRD-<number>) when the product is saved.
+    idInput.value = 'PRD-AUTO';
+    idInput.setAttribute('readonly', 'true');
     barcodeInput.value = '890103' + Math.floor(1000000 + Math.random() * 9000000);
     document.getElementById('prod-min-stock').value = 10;
   } else {
@@ -1249,14 +1457,18 @@ function openProductModal(mode = 'add', prodId = null) {
     document.getElementById('prod-min-stock').value = product.minStock || 10;
     document.getElementById('prod-supplier').value = product.supplier || '';
     document.getElementById('prod-expiry').value = product.expiryDate || '';
+    // Remember the stock shown, so saving other fields never overwrites newer stock.
+    AppState.editOrigQty = product.quantity;
   }
 
   const modal = bootstrap.Modal.getOrCreateInstance(document.getElementById('product-modal'));
   modal.show();
 }
 
-function handleProductFormSubmit(e) {
+async function handleProductFormSubmit(e) {
   e.preventDefault();
+  if (AppState.savingProduct) return;
+
   const form = document.getElementById('product-form');
   if (!form.checkValidity()) {
     form.classList.add('was-validated');
@@ -1277,78 +1489,69 @@ function handleProductFormSubmit(e) {
   const expiryDate = document.getElementById('prod-expiry').value;
 
   const products = CartKaroStore.getProducts();
+  let existing = null;
 
-  // Validate duplicate ID and Barcode
-  if (mode === 'add') {
-    if (products.some(p => p.id.toLowerCase() === id.toLowerCase())) {
-      showToast(`Product ID "${id}" is already used!`, true);
+  if (mode === 'edit') {
+    existing = products.find(p => p.id === id);
+    if (!existing) {
+      showToast('This product no longer exists. Refresh the data and try again.', true);
       SoundFx.alertTone();
       return;
     }
-    if (products.some(p => p.barcode === barcode)) {
-      showToast(`Barcode "${barcode}" is already registered to another product!`, true);
-      SoundFx.alertTone();
-      return;
-    }
-
-    const newProduct = {
-      id, barcode, name, category, costPrice, sellingPrice, quantity, minStock, supplier, expiryDate,
-      createdAt: new Date().toISOString()
-    };
-    products.push(newProduct);
-    CartKaroStore.saveProducts(products);
-    CartKaroStore.logMovement({
-      productId: id,
-      productName: name,
-      barcode: barcode,
-      type: 'STOCK_IN',
-      quantity: quantity,
-      previousStock: 0,
-      newStock: quantity,
-      reason: 'New Product Registration'
-    });
-    showToast(`Product "${name}" added successfully!`);
-    SoundFx.successChime();
-  } else {
-    // Edit mode
-    const index = products.findIndex(p => p.id === id);
-    if (index === -1) return;
-
-    // Check duplicate barcode with other products
-    if (products.some(p => p.id !== id && p.barcode === barcode)) {
-      showToast(`Barcode "${barcode}" is already used by another product!`, true);
-      SoundFx.alertTone();
-      return;
-    }
-
-    const prevQty = products[index].quantity;
-    products[index] = {
-      ...products[index],
-      barcode, name, category, costPrice, sellingPrice, quantity, minStock, supplier, expiryDate,
-      updatedAt: new Date().toISOString()
-    };
-    CartKaroStore.saveProducts(products);
-
-    if (prevQty !== quantity) {
-      CartKaroStore.logMovement({
-        productId: id,
-        productName: name,
-        barcode: barcode,
-        type: quantity > prevQty ? 'STOCK_IN' : 'STOCK_OUT',
-        quantity: Math.abs(quantity - prevQty),
-        previousStock: prevQty,
-        newStock: quantity,
-        reason: 'Manual Stock Count Edit via Product Update'
-      });
-    }
-
-    showToast(`Product "${name}" updated successfully!`);
-    SoundFx.beep(900, 0.1);
   }
 
-  bootstrap.Modal.getInstance(document.getElementById('product-modal')).hide();
-  renderProducts();
-  updateStockAlertsBadge();
+  // Quick duplicate-barcode check (the database enforces it too)
+  if (products.some(p => (!existing || p.id !== existing.id) && p.barcode === barcode)) {
+    showToast(`Barcode "${barcode}" is already registered to another product!`, true);
+    SoundFx.alertTone();
+    return;
+  }
+
+  const settings = CartKaroStore.getSettings();
+  const submitBtn = document.querySelector('#product-modal button[type="submit"]');
+  const unlock = lockButton(submitBtn, '<span class="spinner-border spinner-border-sm me-2"></span>Saving...');
+  AppState.savingProduct = true;
+
+  try {
+    // For an edit, send the stock count only if the user actually changed it.
+    const qtyArg = mode === 'add'
+      ? quantity
+      : (quantity !== AppState.editOrigQty ? quantity : null);
+
+    await CartKaroDB.rpc('save_product', {
+      p_product_id: existing ? existing.dbId : null,
+      p_name: name,
+      p_barcode: barcode,
+      p_category: category,
+      p_price: sellingPrice,
+      p_tax_rate: existing ? existing.taxRate : (settings.defaultGst || 0),
+      p_unit: existing ? existing.unit : 'pack',
+      p_cost_price: costPrice,
+      p_supplier: supplier || null,
+      p_expiry: expiryDate || null,
+      p_quantity: qtyArg,
+      p_reorder_level: minStock
+    });
+
+    bootstrap.Modal.getInstance(document.getElementById('product-modal')).hide();
+    const sync = await CartKaroDB.refreshAll();
+    if (mode === 'add') {
+      showToast(`Product "${name}" added successfully!`);
+      SoundFx.successChime();
+    } else {
+      showToast(`Product "${name}" updated successfully!`);
+      SoundFx.beep(900, 0.1);
+    }
+    if (!sync.ok) showToast(`Saved, but the list could not be refreshed: ${sync.error.message}`, true);
+  } catch (err) {
+    const e = wrapDbError(err);
+    console.error('[CartKaro] save product failed:', err);
+    showToast(`Product was NOT saved: ${e.message}`, true);
+    SoundFx.alertTone();
+  } finally {
+    AppState.savingProduct = false;
+    unlock();
+  }
 }
 
 function deleteProduct(prodId) {
@@ -1358,23 +1561,23 @@ function deleteProduct(prodId) {
 
   openConfirmModal({
     title: 'Delete Product?',
-    message: `Are you sure you want to delete "${product.name}" (${product.id})? This will permanently remove it from catalog.`,
-    onConfirm: () => {
-      const updated = products.filter(p => p.id !== prodId);
-      CartKaroStore.saveProducts(updated);
-      CartKaroStore.logMovement({
-        productId: product.id,
-        productName: product.name,
-        barcode: product.barcode,
-        type: 'STOCK_OUT',
-        quantity: product.quantity,
-        previousStock: product.quantity,
-        newStock: 0,
-        reason: 'Product Deletion from Catalog'
-      });
-      showToast(`Product "${product.name}" deleted.`);
-      renderProducts();
-      updateStockAlertsBadge();
+    message: `Are you sure you want to delete "${product.name}" (${product.id})? Products that already appear on bills are archived instead, so old bills stay intact.`,
+    onConfirm: async () => {
+      try {
+        const res = await CartKaroDB.rpc('delete_product', { p_product_id: product.dbId });
+        const sync = await CartKaroDB.refreshAll();
+        if (res && res.mode === 'archived') {
+          showToast(`"${product.name}" has sales history, so it was archived (hidden) instead of deleted.`);
+        } else {
+          showToast(`Product "${product.name}" deleted.`);
+        }
+        if (!sync.ok) showToast(`Deleted, but the list could not be refreshed: ${sync.error.message}`, true);
+      } catch (err) {
+        const e = wrapDbError(err);
+        console.error('[CartKaro] delete product failed:', err);
+        showToast(`Product was NOT deleted: ${e.message}`, true);
+        SoundFx.alertTone();
+      }
     }
   });
 }
@@ -1548,12 +1751,17 @@ function updateStockModalPreview() {
   projectedDisplay.textContent = `${newQty} Units`;
 }
 
-function handleStockFormSubmit(e) {
+async function handleStockFormSubmit(e) {
   e.preventDefault();
+  if (AppState.savingStock) return;
+
   const products = CartKaroStore.getProducts();
   const prodId = document.getElementById('stock-product-select').value;
   const product = products.find(p => p.id === prodId);
-  if (!product) return;
+  if (!product) {
+    showToast('Select a product first.', true);
+    return;
+  }
 
   const opType = document.querySelector('input[name="stockOpType"]:checked').value;
   const qty = parseInt(document.getElementById('stock-qty-input').value, 10) || 0;
@@ -1566,44 +1774,40 @@ function handleStockFormSubmit(e) {
     SoundFx.alertTone();
     return;
   }
-
-  const prevQty = product.quantity;
-  let newQty = prevQty;
-
-  if (opType === 'IN') {
-    newQty = prevQty + qty;
-  } else if (opType === 'OUT') {
-    if (qty > prevQty) {
-      showToast(`Cannot deduct ${qty} units! Current stock is only ${prevQty}.`, true);
-      SoundFx.alertTone();
-      return;
-    }
-    newQty = prevQty - qty;
-  } else if (opType === 'ADJUST') {
-    newQty = qty;
+  if (opType === 'OUT' && qty > product.quantity) {
+    showToast(`Cannot deduct ${qty} units! Current stock is only ${product.quantity}.`, true);
+    SoundFx.alertTone();
+    return;
   }
 
-  product.quantity = newQty;
-  CartKaroStore.saveProducts(products);
+  const submitBtn = document.querySelector('#stock-modal button[type="submit"]');
+  const unlock = lockButton(submitBtn, '<span class="spinner-border spinner-border-sm me-2"></span>Saving...');
+  AppState.savingStock = true;
 
-  CartKaroStore.logMovement({
-    productId: product.id,
-    productName: product.name,
-    barcode: product.barcode,
-    type: opType === 'IN' ? 'STOCK_IN' : 'STOCK_OUT',
-    quantity: Math.abs(newQty - prevQty),
-    previousStock: prevQty,
-    newStock: newQty,
-    reason: fullReason
-  });
+  try {
+    const result = await CartKaroDB.rpc('adjust_stock', {
+      p_product_id: product.dbId,
+      p_op: opType === 'ADJUST' ? 'SET' : opType,
+      p_quantity: qty,
+      p_reason: fullReason
+    });
 
-  bootstrap.Modal.getInstance(document.getElementById('stock-modal')).hide();
-  showToast(`Inventory updated for "${product.name}". New Stock: ${newQty} units`);
-  SoundFx.successChime();
-
-  renderInventory();
-  renderProducts();
-  updateStockAlertsBadge();
+    bootstrap.Modal.getInstance(document.getElementById('stock-modal')).hide();
+    const sync = await CartKaroDB.refreshAll();
+    showToast(`Inventory updated for "${product.name}". New Stock: ${toNum(result.new_stock)} units`);
+    SoundFx.successChime();
+    if (!sync.ok) showToast(`Saved, but the list could not be refreshed: ${sync.error.message}`, true);
+  } catch (err) {
+    const e = wrapDbError(err);
+    console.error('[CartKaro] stock adjustment failed:', err);
+    showToast(`Stock was NOT changed: ${e.message}`, true);
+    SoundFx.alertTone();
+    // Stock may have changed elsewhere (e.g. another till): show the real numbers.
+    CartKaroDB.refreshAll();
+  } finally {
+    AppState.savingStock = false;
+    unlock();
+  }
 }
 
 // ==========================================================================
@@ -1925,41 +2129,45 @@ function renderPOSCart() {
 }
 
 function calculatePOSBill(subtotal) {
+  subtotal = round2(subtotal);
   document.getElementById('pos-calc-subtotal').textContent = formatINR(subtotal);
 
-  // Discount
+  // Discount (rounded to paise exactly like the database function does)
   const discType = document.getElementById('pos-discount-type').value;
   const discVal = parseFloat(document.getElementById('pos-discount-val').value) || 0;
   let discountAmount = 0;
   if (discType === 'percent') {
-    discountAmount = (subtotal * Math.min(100, Math.max(0, discVal))) / 100;
+    discountAmount = round2((subtotal * Math.min(100, Math.max(0, discVal))) / 100);
   } else {
-    discountAmount = Math.min(subtotal, Math.max(0, discVal));
+    discountAmount = round2(Math.min(subtotal, Math.max(0, discVal)));
   }
 
-  const taxableAmount = Math.max(0, subtotal - discountAmount);
+  const taxableAmount = round2(Math.max(0, subtotal - discountAmount));
 
   // GST
   const gstRate = parseFloat(document.getElementById('pos-gst-select').value) || 0;
   document.getElementById('pos-gst-label').textContent = `${gstRate}%`;
-  const gstAmount = (taxableAmount * gstRate) / 100;
+  const gstAmount = round2((taxableAmount * gstRate) / 100);
   document.getElementById('pos-calc-gst').textContent = formatINR(gstAmount);
 
   // Grand Total
-  const grandTotal = taxableAmount + gstAmount;
+  const grandTotal = round2(taxableAmount + gstAmount);
   document.getElementById('pos-calc-grand-total').textContent = formatINR(grandTotal);
 
   // Cash change due calculation
   const cashReceivedInput = document.getElementById('pos-cash-received');
   const cashReceived = parseFloat(cashReceivedInput.value) || 0;
   const changeDueEl = document.getElementById('pos-change-due');
-  const changeDue = Math.max(0, cashReceived - grandTotal);
+  const changeDue = round2(Math.max(0, cashReceived - grandTotal));
   changeDueEl.textContent = formatINR(changeDue);
 
   return { subtotal, discountAmount, gstRate, gstAmount, grandTotal, cashReceived, changeDue };
 }
 
-function handlePOSCheckout() {
+async function handlePOSCheckout() {
+  // Block double-clicks / Enter-key repeats while a sale is being saved.
+  if (AppState.checkoutInFlight) return;
+
   if (AppState.cart.length === 0) {
     showToast('Cannot complete checkout: Cart is empty!', true);
     SoundFx.alertTone();
@@ -1976,72 +2184,95 @@ function handlePOSCheckout() {
     return;
   }
 
-  const customerName = document.getElementById('pos-customer-name').value.trim() || 'Walk-in Customer';
-  const customerPhone = document.getElementById('pos-customer-phone').value.trim();
+  const typedName = document.getElementById('pos-customer-name').value.trim();
+  const phoneRaw = document.getElementById('pos-customer-phone').value.trim();
+  const phoneDigits = phoneRaw.replace(/\D/g, '').slice(-10);
   const cardRef = document.getElementById('pos-card-ref').value.trim();
 
-  // Deduct inventory & record movement logs
-  const products = CartKaroStore.getProducts();
-  AppState.cart.forEach(cartItem => {
-    const prod = products.find(p => p.id === cartItem.productId);
-    if (prod) {
-      const prevStock = prod.quantity;
-      prod.quantity = Math.max(0, prod.quantity - cartItem.quantity);
-      CartKaroStore.logMovement({
-        productId: prod.id,
-        productName: prod.name,
-        barcode: prod.barcode,
-        type: 'SALE',
-        quantity: cartItem.quantity,
-        previousStock: prevStock,
-        newStock: prod.quantity,
-        reason: `Bill Sale Invoice #${AppState.cartBillNo}`
-      });
-    }
-  });
-  CartKaroStore.saveProducts(products);
+  if (phoneRaw && phoneDigits.length !== 10) {
+    showToast('Customer phone must have 10 digits (or leave it blank for a walk-in customer).', true);
+    SoundFx.alertTone();
+    return;
+  }
 
-  // Create Bill Object
-  const newBill = {
-    billNo: AppState.cartBillNo,
-    date: new Date().toISOString(),
-    customerName,
-    customerPhone,
-    items: [...AppState.cart],
-    subtotal: billCalc.subtotal,
-    discountType: document.getElementById('pos-discount-type').value,
-    discountValue: parseFloat(document.getElementById('pos-discount-val').value) || 0,
-    discountAmount: billCalc.discountAmount,
-    gstRate: billCalc.gstRate,
-    gstAmount: billCalc.gstAmount,
-    grandTotal: billCalc.grandTotal,
-    paymentMethod,
-    amountPaid: paymentMethod === 'Cash' ? (billCalc.cashReceived || billCalc.grandTotal) : billCalc.grandTotal,
-    changeDue: paymentMethod === 'Cash' ? billCalc.changeDue : 0,
-    cardRef,
-    status: 'Completed'
+  // Map cart lines to database product ids
+  const products = CartKaroStore.getProducts();
+  const items = [];
+  for (const line of AppState.cart) {
+    const prod = products.find(p => p.id === line.productId);
+    if (!prod || !prod.dbId) {
+      showToast(`"${line.name}" is not in the database any more. Remove it from the cart.`, true);
+      SoundFx.alertTone();
+      return;
+    }
+    items.push({ product_id: prod.dbId, quantity: line.quantity });
+  }
+
+  const payload = {
+    p_request_id: null,
+    p_customer_name: typedName || null,
+    p_customer_phone: phoneDigits || null,
+    p_items: items,
+    p_discount_type: document.getElementById('pos-discount-type').value,
+    p_discount_value: parseFloat(document.getElementById('pos-discount-val').value) || 0,
+    p_gst_rate: billCalc.gstRate,
+    p_payment_method: paymentMethod.toUpperCase(),
+    p_amount_tendered: paymentMethod === 'Cash' && billCalc.cashReceived > 0 ? billCalc.cashReceived : null,
+    p_reference: cardRef || null
   };
 
-  const bills = CartKaroStore.getBills();
-  bills.unshift(newBill);
-  CartKaroStore.saveBills(bills);
+  // Same request id for a retry of the SAME bill, so the database returns the
+  // already-saved bill instead of creating a duplicate. Any change = new bill.
+  const signature = JSON.stringify({ ...payload, p_request_id: null });
+  if (!AppState.checkoutAttempt || AppState.checkoutAttempt.signature !== signature) {
+    AppState.checkoutAttempt = { id: newRequestId(), signature };
+  }
+  payload.p_request_id = AppState.checkoutAttempt.id;
 
-  // Sound chime
-  SoundFx.successChime();
-  showToast(`Bill ${newBill.billNo} completed successfully!`);
+  const checkoutBtn = document.getElementById('pos-checkout-btn');
+  const unlock = lockButton(checkoutBtn, '<span class="spinner-border spinner-border-sm me-2"></span>Saving bill...');
+  AppState.checkoutInFlight = true;
 
-  // Open Receipt Modal
-  openReceiptModal(newBill);
+  try {
+    const result = await CartKaroDB.rpc('create_sale', payload);
+    const newBill = mapRpcBill(result);
+    if (!newBill.customerId && typedName) newBill.customerName = typedName; // walk-in who gave a name (name is printed only)
 
-  // Reset Cart for next customer
-  AppState.cart = [];
-  AppState.cartBillNo = getNextBillNumber();
-  document.getElementById('pos-customer-name').value = '';
-  document.getElementById('pos-customer-phone').value = '';
-  document.getElementById('pos-cash-received').value = '';
-  document.getElementById('pos-card-ref').value = '';
-  renderPOS();
-  updateStockAlertsBadge();
+    AppState.checkoutAttempt = null;
+
+    // Bill is saved. Reload live data (stock, dashboard, history).
+    const sync = await CartKaroDB.refreshAll();
+
+    SoundFx.successChime();
+    if (result.already_processed) {
+      showToast(`Bill ${newBill.billNo} was already saved - no duplicate was created.`);
+    } else {
+      showToast(`Bill ${newBill.billNo} saved (database ID ${newBill.billId}).`);
+    }
+    if (!sync.ok) showToast(`Bill saved, but the screens could not be refreshed: ${sync.error.message}`, true);
+
+    openReceiptModal(newBill);
+
+    // Reset Cart for next customer
+    AppState.cart = [];
+    AppState.cartBillNo = getNextBillNumber();
+    document.getElementById('pos-customer-name').value = '';
+    document.getElementById('pos-customer-phone').value = '';
+    document.getElementById('pos-cash-received').value = '';
+    document.getElementById('pos-card-ref').value = '';
+    renderPOS();
+    updateStockAlertsBadge();
+  } catch (err) {
+    const e = wrapDbError(err);
+    console.error('[CartKaro] checkout failed:', err, payload);
+    // Cart is kept. Retrying the same cart reuses the request id, so it cannot double-bill.
+    showToast(`Bill was NOT completed: ${e.message}`, true);
+    SoundFx.alertTone();
+    if (e.code === 'P0001' || /stock/i.test(e.message)) CartKaroDB.refreshAll(); // show live stock
+  } finally {
+    AppState.checkoutInFlight = false;
+    unlock();
+  }
 }
 
 // ==========================================================================
@@ -2268,35 +2499,24 @@ function voidBill(billNo) {
     title: 'Return / Void Invoice?',
     message: `Are you sure you want to void Bill ${billNo} (${formatINR(bill.grandTotal)})? All purchased items will be restored to inventory stock.`,
     iconClass: 'bi-arrow-return-left',
-    onConfirm: () => {
-      bill.status = 'Returned';
-      CartKaroStore.saveBills(bills);
-
-      // Restore product stock
-      const products = CartKaroStore.getProducts();
-      (bill.items || []).forEach(item => {
-        const prod = products.find(p => p.id === item.productId);
-        if (prod) {
-          const prev = prod.quantity;
-          prod.quantity += Number(item.quantity || 0);
-          CartKaroStore.logMovement({
-            productId: prod.id,
-            productName: prod.name,
-            barcode: prod.barcode,
-            type: 'STOCK_IN',
-            quantity: item.quantity,
-            previousStock: prev,
-            newStock: prod.quantity,
-            reason: `Return/Void Restock for ${billNo}`
-          });
-        }
-      });
-      CartKaroStore.saveProducts(products);
-
-      showToast(`Bill ${billNo} has been marked as Returned and stock restored.`);
-      SoundFx.beep(750, 0.15);
-      renderSales();
-      updateStockAlertsBadge();
+    onConfirm: async () => {
+      if (AppState.voidingBill) return;
+      AppState.voidingBill = true;
+      try {
+        await CartKaroDB.rpc('void_bill', { p_bill_id: bill.billId });
+        const sync = await CartKaroDB.refreshAll();
+        showToast(`Bill ${billNo} has been marked as Returned and stock restored.`);
+        SoundFx.beep(750, 0.15);
+        if (!sync.ok) showToast(`Saved, but the list could not be refreshed: ${sync.error.message}`, true);
+      } catch (err) {
+        const e = wrapDbError(err);
+        console.error('[CartKaro] void bill failed:', err);
+        showToast(`Bill was NOT voided: ${e.message}`, true);
+        SoundFx.alertTone();
+        CartKaroDB.refreshAll();
+      } finally {
+        AppState.voidingBill = false;
+      }
     }
   });
 }
@@ -2579,29 +2799,9 @@ function exportDatabaseBackup() {
 }
 
 function importDatabaseBackup(file) {
-  if (!file) return;
-  const reader = new FileReader();
-  reader.onload = e => {
-    try {
-      const data = JSON.parse(e.target.result);
-      if (!data.products || !data.bills) {
-        throw new Error('Invalid backup file structure');
-      }
-
-      CartKaroStore.saveProducts(data.products);
-      CartKaroStore.saveBills(data.bills);
-      if (data.movements) CartKaroStore.saveMovements(data.movements);
-      if (data.settings) CartKaroStore.saveSettings(data.settings);
-
-      showToast('Data imported and restored successfully!');
-      SoundFx.successChime();
-      renderView(AppState.currentView);
-    } catch (err) {
-      showToast('Error importing file: Invalid JSON backup.', true);
-      SoundFx.alertTone();
-    }
-  };
-  reader.readAsText(file);
+  // Restoring a JSON file would only change the browser cache, never the database,
+  // so it is intentionally disabled. Use the Supabase SQL Editor to restore data.
+  showToast('Restore is disabled: data lives in Supabase. Use the Supabase dashboard to restore a database backup.', true);
 }
 
 // Export CSV Helper
@@ -3183,51 +3383,45 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Reload Sample Demo Data
+  // Refresh from Supabase (replaces the old "reload demo data" action)
   const reloadDemoBtn = document.getElementById('reload-demo-data-btn');
   if (reloadDemoBtn) {
-    reloadDemoBtn.addEventListener('click', () => {
+    reloadDemoBtn.addEventListener('click', async () => {
+      const unlock = lockButton(reloadDemoBtn, '<span class="spinner-border spinner-border-sm me-1"></span> Refreshing...');
+      const res = await CartKaroDB.refreshAll();
+      unlock();
+      if (res.ok) {
+        showToast('Data refreshed from Supabase.');
+        SoundFx.successChime();
+      } else {
+        showToast(`Refresh failed: ${res.error.message}`, true);
+        SoundFx.alertTone();
+      }
+    });
+  }
+
+  // Clear local cache + settings (never touches the database)
+  const resetAllBtn = document.getElementById('reset-all-data-btn');
+  if (resetAllBtn) {
+    resetAllBtn.addEventListener('click', () => {
       openConfirmModal({
-        title: 'Reload Sample Supermarket Data?',
-        message: 'This will reset your catalog and seed 18 fresh realistic products, past bills, and demo movement logs.',
+        title: 'Reset Local Settings?',
+        message: 'This resets shop settings stored in this browser and reloads data from Supabase. Products, bills and stock in the database are NOT deleted.',
         iconClass: 'bi-arrow-counterclockwise',
-        onConfirm: () => {
-          CartKaroStore.initSeedData(true);
-          showToast('Sample demonstration data reloaded successfully!');
-          SoundFx.successChime();
-          renderView(AppState.currentView);
-          updateStockAlertsBadge();
+        onConfirm: async () => {
+          localStorage.removeItem(STORAGE_KEYS.SETTINGS);
+          CartKaroStore.saveSettings({ ...DEFAULT_SETTINGS });
+          AppState.cart = [];
+          AppState.checkoutAttempt = null;
+          showToast('Local settings reset. Reloading data from Supabase...');
+          await CartKaroDB.refreshAll();
+          renderSettings();
         }
       });
     });
   }
 
-  // Wipe All Data Factory Reset
-  const resetAllBtn = document.getElementById('reset-all-data-btn');
-  if (resetAllBtn) {
-    resetAllBtn.addEventListener('click', () => {
-      openConfirmModal({
-        title: 'Factory Reset All Data?',
-        message: 'DANGER: This will permanently delete ALL products, sales history, movement logs, and custom settings. This cannot be undone!',
-        iconClass: 'bi-trash3 text-danger',
-        onConfirm: () => {
-          localStorage.removeItem(STORAGE_KEYS.PRODUCTS);
-          localStorage.removeItem(STORAGE_KEYS.BILLS);
-          localStorage.removeItem(STORAGE_KEYS.MOVEMENTS);
-          localStorage.removeItem(STORAGE_KEYS.SETTINGS);
-          CartKaroStore.saveProducts([]);
-          CartKaroStore.saveBills([]);
-          CartKaroStore.saveMovements([]);
-          CartKaroStore.saveSettings(DEFAULT_SETTINGS);
-          AppState.cart = [];
-          showToast('All data has been wiped clean.');
-          SoundFx.alertTone();
-          renderView(AppState.currentView);
-          updateStockAlertsBadge();
-        }
-      });
-    });
-  }
+  applyDatabaseModeLabels();
 
   // 13. Supabase Client Initialization & Event Handlers
   SupabaseService.init();
@@ -3243,7 +3437,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (res.error) {
         sbTestOutput.innerHTML = `<span class="text-danger">Query Error:</span>\n${esc(JSON.stringify(res.error, null, 2))}`;
       } else if (res.isRlsRestricted) {
-        sbTestOutput.innerHTML = `<span class="text-warning">RLS Restriction Detected:</span>\nQuery executed successfully (HTTP 200), but PostgreSQL Row Level Security returned 0 rows because the policy 'staff_all_products' requires an authenticated staff user.\n\nTo view real database rows:\n1) Sign in with a staff email & password below\n2) Or run in Supabase SQL editor:\n   CREATE POLICY "anon_read" ON public.products FOR SELECT TO anon USING (true);`;
+        sbTestOutput.innerHTML = `<span class="text-warning">RLS Restriction Detected:</span>\nQuery executed successfully (HTTP 200), but PostgreSQL Row Level Security returned 0 rows because you are not signed in. Sign in with a staff account.`;
       } else {
         sbTestOutput.innerHTML = `<span class="text-success">Success! Found ${res.data.length} products in Supabase:</span>\n${esc(JSON.stringify(res.data.slice(0, 3), null, 2))}`;
       }
@@ -3270,7 +3464,7 @@ document.addEventListener('DOMContentLoaded', () => {
       } else {
         showToast(`Signed in successfully as ${email}!`);
         SoundFx.successChime();
-        syncSupabaseData();
+        await syncSupabaseData();
       }
     });
   }
@@ -3279,28 +3473,90 @@ document.addEventListener('DOMContentLoaded', () => {
   if (sbLogoutBtn) {
     sbLogoutBtn.addEventListener('click', async () => {
       await SupabaseService.signOut();
+      CartKaroStore.clearData();
+      AppState.cart = [];
+      AppState.lastSync = null;
+      AppState.syncError = null;
+      CartKaroDB.updateStorageLabel();
+      CartKaroDB.rerender();
       showToast('Logged out from staff session.');
-      renderProducts();
     });
   }
 
-  // Initial Sync from Supabase (Read-only)
+  // Load everything from Supabase (products, inventory, bills, stock movements)
   async function syncSupabaseData() {
-    const res = await SupabaseService.fetchProducts();
-    if (res.data && res.data.length > 0) {
-      CartKaroStore.saveProducts(res.data);
-      renderView(AppState.currentView);
-      updateStockAlertsBadge();
-      showToast(`Loaded ${res.data.length} products from Supabase database!`);
+    const res = await CartKaroDB.refreshAll();
+    if (res.ok) {
+      showToast(`Loaded ${CartKaroStore.getProducts().length} products and ${CartKaroStore.getBills().length} bills from Supabase.`);
+    } else if (res.error && res.error.code === 'AUTH_REQUIRED') {
+      showToast('Sign in with your staff account (Supabase badge, top bar) to load data.', true);
     } else {
-      renderProducts();
+      showToast(`Could not load data: ${res.error.message}`, true);
     }
+    return res;
   }
 
-  syncSupabaseData();
+  // Sign-out from another tab or an expired session: drop cached data
+  if (SupabaseService.client) {
+    SupabaseService.client.auth.onAuthStateChange(event => {
+      if (event === 'SIGNED_OUT') {
+        SupabaseService.isAuthenticated = false;
+        SupabaseService.currentUser = null;
+        CartKaroStore.clearData();
+        AppState.lastSync = null;
+        SupabaseService.updateStatusBadge();
+        CartKaroDB.updateStorageLabel();
+        CartKaroDB.rerender();
+      }
+    });
+  }
+
+  // Initial load: restore session, then read live data
+  (async () => {
+    await SupabaseService.checkAuth();
+    if (SupabaseService.isAuthenticated) {
+      await syncSupabaseData();
+    } else {
+      CartKaroDB.updateStorageLabel();
+      CartKaroDB.rerender();
+      showToast('Sign in with your staff account (Supabase badge, top bar) to load data.', true);
+    }
+  })();
 
   // Initial Load: Route to hash or dashboard
   const initialHash = window.location.hash.replace('#', '') || 'dashboard';
   switchView(initialHash);
   AppState.cartBillNo = getNextBillNumber();
 });
+
+// Relabel the settings/footers that used to describe LocalStorage so the UI tells the truth.
+function applyDatabaseModeLabels() {
+  const setText = (el, text) => { if (el) el.textContent = text; };
+
+  const reloadBtn = document.getElementById('reload-demo-data-btn');
+  if (reloadBtn) {
+    reloadBtn.innerHTML = '<i class="bi bi-arrow-repeat me-1"></i> Refresh Data from Supabase';
+    const box = reloadBtn.parentElement;
+    setText(box.querySelector('label'), 'Sync With Database');
+    setText(box.querySelector('p'), 'Re-reads products, stock, bills and movements from Supabase.');
+  }
+
+  const resetBtn = document.getElementById('reset-all-data-btn');
+  if (resetBtn) {
+    resetBtn.innerHTML = '<i class="bi bi-arrow-counterclockwise me-1"></i> Reset Local Settings';
+    const box = resetBtn.parentElement;
+    setText(box.querySelector('label'), 'Reset Local Settings');
+    setText(box.querySelector('p'), 'Resets shop settings saved in this browser. Database records are never deleted from here.');
+  }
+
+  const exportBtn = document.getElementById('export-backup-btn');
+  if (exportBtn) {
+    const desc = exportBtn.closest('.card-body') && exportBtn.closest('.card-body').querySelector('p');
+    setText(desc, 'Products, bills and stock live in Supabase. This export downloads a JSON snapshot of what is currently loaded.');
+  }
+
+  const importInput = document.getElementById('import-backup-file');
+  if (importInput && importInput.closest('label')) importInput.closest('label').classList.add('d-none');
+
+  CartKaroDB.updateStorageLabel();
+}
