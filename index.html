@@ -1,6 +1,16 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <!-- Apply the saved theme BEFORE the page paints (prevents a white flash in dark mode) -->
+  <script>
+    (function () {
+      try {
+        if (localStorage.getItem('cartkaro_theme') === 'dark') {
+          document.documentElement.setAttribute('data-bs-theme', 'dark');
+        }
+      } catch (e) { /* storage blocked - stay in light mode */ }
+    })();
+  </script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>CartKaro - Supermarket Inventory & Billing Management System</title>
@@ -25,6 +35,9 @@
 
   <!-- Custom CSS -->
   <link rel="stylesheet" href="style.css">
+
+  <!-- Dark mode styles (only take effect when <html data-bs-theme="dark">) -->
+  <link rel="stylesheet" href="dark-theme.css">
 </head>
 <body class="bg-light">
 
@@ -194,6 +207,12 @@
           <button class="btn btn-outline-primary btn-sm d-flex align-items-center gap-1 nav-link-btn" data-target="scanner" title="Scan Barcode">
             <i class="bi bi-upc-scan"></i>
             <span class="d-none d-sm-inline">Scan</span>
+          </button>
+
+          <!-- Dark / Light Mode Toggle -->
+          <button type="button" class="btn btn-sm btn-outline-secondary border d-flex align-items-center gap-1" id="theme-toggle-btn" title="Switch to dark mode" aria-label="Switch to dark mode" aria-pressed="false">
+            <i class="bi bi-moon-stars-fill" id="theme-toggle-icon"></i>
+            <span class="d-none d-md-inline small fw-semibold" id="theme-toggle-text">Dark</span>
           </button>
 
           <!-- Supabase Connection & Staff Login Badge -->
@@ -1857,41 +1876,5 @@
 
   <!-- Core Application Logic -->
   <script src="app.js"></script>
-  <!-- CartKaro Dark Mode Button -->
-<button id="themeToggle" style="
-    position: fixed;
-    bottom: 25px;
-    right: 25px;
-    z-index: 999999;
-    padding: 12px 20px;
-    border: none;
-    border-radius: 30px;
-    background: #2563eb;
-    color: white;
-    font-size: 14px;
-    font-weight: bold;
-    cursor: pointer;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.25);
-">
-    🌙 Dark Mode
-</button>
-
-<script>
-(function () {
-    const button = document.getElementById('themeToggle');
-
-    function applyTheme(dark) {
-        document.body.classList.toggle('dark-mode', dark);
-        button.textContent = dark ? '☀️ Light Mode' : '🌙 Dark Mode';
-        localStorage.setItem('cartkaro_theme', dark ? 'dark' : 'light');
-    }
-
-    button.addEventListener('click', function () {
-        applyTheme(!document.body.classList.contains('dark-mode'));
-    });
-
-    applyTheme(localStorage.getItem('cartkaro_theme') === 'dark');
-})();
-</script>
 </body>
 </html>
