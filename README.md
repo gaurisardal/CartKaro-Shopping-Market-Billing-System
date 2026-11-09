@@ -2,6 +2,11 @@
 
 CartKaro is a web-based supermarket management system with fast Point-of-Sale (POS) billing, live inventory tracking and sales analytics. It is built as a college project using plain HTML, CSS and JavaScript on the front end, with Supabase (PostgreSQL) as the database.
 
+Website Link: https://cartkaro-supermarketbillingsystem.netlify.app/#inventory
+Login Details:-
+email : guest123@gmail.com
+password: guest123
+
 ## Features
 
 - **Dashboard** - today's sales, total invoices, inventory value, total revenue, low-stock alerts, best-selling products, and sales and payment charts
